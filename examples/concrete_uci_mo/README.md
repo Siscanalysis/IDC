@@ -96,8 +96,9 @@ cmake --build . --target concrete_uci_mo
 ./bin/concrete_uci_mo
 ```
 
-The Pareto front plot is reported in Figure~[TBD] of the paper; the
-internal-gap and boundary-gap stability metrics in Table~[TBD].
+The Pareto front plot is reported in the §8.5 Pareto-front figure of the
+paper; the internal-gap and boundary-gap stability metrics in the §8.5
+results table.
 
 ## Why this is interesting
 

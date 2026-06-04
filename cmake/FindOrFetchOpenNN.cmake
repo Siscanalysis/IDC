@@ -27,18 +27,51 @@
 #
 # The examples build against the refactored OpenNN API (JSON model format and
 # the ResponseOptimization class used throughout §8), which currently lives on
-# the `dev-refactor` branch of Artelnics/opennn. Until that work is cut into a
-# numbered release, the default tracks that branch so the repository builds out
-# of the box. The published tags v6.0.x predate the refactor and will NOT
-# compile these examples.
+# the `dev-refactor` branch of Artelnics/opennn. That work is published as the
+# immutable annotated tag `v1.0-IDC-paper` (commit 26cd4634a) -- the paper
+# version of record -- so a clean clone is byte-reproducible and does not drift
+# as `dev-refactor` advances. The published tags v6.0.x predate the refactor and
+# will NOT compile these examples.
 #
-# Action item on paper acceptance: once Artelnics/opennn tags the refactor
-# (e.g. v6.1.0 / v1.0-IDC-paper), set OPENNN_DEFAULT_TAG below to that tag for
-# byte-reproducibility and bump CITATION.cff's references.OpenNN.version field.
-#
-set(OPENNN_DEFAULT_TAG "dev-refactor" CACHE STRING
-    "Default OpenNN ref for reproduction. Tracks the refactor branch until a \
-     numbered release of Artelnics/opennn carries the §8 ResponseOptimization API.")
+set(OPENNN_DEFAULT_TAG "v1.0-IDC-paper" CACHE STRING
+    "Default OpenNN ref for reproduction. Pinned to the immutable tag \
+     v1.0-IDC-paper (commit 26cd4634a) on Artelnics/opennn -- the §8 \
+     ResponseOptimization API, the paper version of record.")
+
+# -----------------------------------------------------------------------------
+# Eigen (required by OpenNN)
+# -----------------------------------------------------------------------------
+# OpenNN's CMake links the `Eigen3::Eigen` target but expects the *consumer* to
+# supply it (it neither find_package'es nor vendors Eigen). We provide it here
+# so a clean clone builds out of the box: prefer a discoverable system/local
+# Eigen, otherwise fetch the pinned header-only Eigen 3.4.0 (no Eigen build).
+# Override discovery with -DEigen3_DIR=<path> or -DEIGEN3_INCLUDE_DIR=<path>.
+if(NOT TARGET Eigen3::Eigen)
+    find_package(Eigen3 3.4 QUIET NO_MODULE)
+endif()
+if(NOT TARGET Eigen3::Eigen AND EIGEN3_INCLUDE_DIR)
+    add_library(Eigen3::Eigen INTERFACE IMPORTED)
+    set_target_properties(Eigen3::Eigen PROPERTIES
+        INTERFACE_INCLUDE_DIRECTORIES "${EIGEN3_INCLUDE_DIR}")
+    message(STATUS "Eigen: using EIGEN3_INCLUDE_DIR=${EIGEN3_INCLUDE_DIR}")
+endif()
+if(NOT TARGET Eigen3::Eigen)
+    message(STATUS "Eigen: fetching header-only 3.4.0 via FetchContent")
+    include(FetchContent)
+    # SOURCE_SUBDIR points at a non-existent dir so MakeAvailable only *downloads*
+    # Eigen (header-only) without running Eigen's own heavy CMake project.
+    FetchContent_Declare(
+        eigen
+        GIT_REPOSITORY https://gitlab.com/libeigen/eigen.git
+        GIT_TAG        3.4.0
+        GIT_SHALLOW    TRUE
+        SOURCE_SUBDIR  cmake-does-not-exist
+    )
+    FetchContent_MakeAvailable(eigen)
+    add_library(Eigen3::Eigen INTERFACE IMPORTED)
+    set_target_properties(Eigen3::Eigen PROPERTIES
+        INTERFACE_INCLUDE_DIRECTORIES "${eigen_SOURCE_DIR}")
+endif()
 
 # -----------------------------------------------------------------------------
 # Tier 1 — OPENNN_ROOT (local checkout)

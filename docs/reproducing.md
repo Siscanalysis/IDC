@@ -17,11 +17,12 @@ real-application case studies, see
   - Linux: GCC 11+ or Clang 14+
   - macOS: Apple Clang 14+
 - **CMake ≥ 3.20.**
-- **Git** (the build fetches OpenNN via `FetchContent`; the default ref is
-  the `dev-refactor` branch that carries the `ResponseOptimization` API —
-  see [`cmake/FindOrFetchOpenNN.cmake`](../cmake/FindOrFetchOpenNN.cmake)).
-  Eigen ships vendored inside the OpenNN repository, so no submodule step
-  is needed.
+- **Git** (the build fetches OpenNN via `FetchContent`; the default ref is a
+  pinned OpenNN commit — the paper version of record — that carries the
+  `ResponseOptimization` API, see
+  [`cmake/FindOrFetchOpenNN.cmake`](../cmake/FindOrFetchOpenNN.cmake)).
+  Eigen (header-only) is fetched automatically by the build, so no manual
+  Eigen install or submodule step is needed.
 
 > **MSVC note.** Building the full OpenNN static library from source can be
 > heavy on MSVC. If the link step is slow or fails, point the build at a
@@ -71,7 +72,8 @@ cmake -DOPENNN_ROOT=/path/to/local/opennn -DCMAKE_BUILD_TYPE=Release ..
 cmake --build . --config Release -j
 ```
 
-Expected build time: ~[TBD] minutes on a recent 8-core CPU.
+Expected build time: a few minutes on a recent multi-core CPU, dominated
+by the one-time OpenNN compilation; subsequent rebuilds are incremental.
 
 ---
 
@@ -160,7 +162,10 @@ python aggregate_21seeds.py      # per-problem + combined summaries
 python make_figures.py           # figures used in §8
 ```
 
-Expected total runtime on commodity hardware: ~[TBD] hours.
+Expected total runtime: on the order of a couple of hours on a recent
+multi-core CPU. Wall-clock is dominated by the pymoo baselines (~20 s per
+seed); IDC itself runs in well under a second per seed, and the three C++
+case-study examples alone finish in seconds.
 
 Per-problem CSVs land in `benchmarks/results/branch_a/<problem>_idc.csv`;
 aggregated summaries land in
@@ -203,8 +208,8 @@ exist and are up to date.
 
 ## Verifying the output
 
-Each example folder ships an `expected_output.csv`. After running an
-example, run:
+If an example folder carries a committed `expected_output.csv` reference,
+validate a fresh run against it:
 
 ```bash
 python scripts/compare_outputs.py examples/<name>/
@@ -212,7 +217,10 @@ python scripts/compare_outputs.py examples/<name>/
 
 This compares the freshly produced `result.csv` against
 `expected_output.csv` element-wise with a tolerance of 1e-5 on inputs
-and 1e-3 on outputs. Differences are reported with the relative gap.
+and 1e-3 on outputs, reporting any expected row that has no match. When no
+`expected_output.csv` is present the script skips with a notice (nothing
+to compare against). To create a reference, save a trusted run's
+`result.csv` as `expected_output.csv` in the example folder.
 
 If you used the default `OPENNN_TAG` and the same compiler family,
 the outputs should match exactly; minor floating-point drift across

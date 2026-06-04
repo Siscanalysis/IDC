@@ -89,4 +89,5 @@ cmake --build . --target photo_pce10
 ./bin/photo_pce10
 ```
 
-Headline number reported in Table~[TBD] of the paper.
+Headline number reported in the §8.4 results table of the paper
+(Photo-PCE10 held-out cross-validation).

@@ -51,7 +51,10 @@ number in the §8.4 table of the paper.
 ./scripts/reproduce_paper.sh   # runs all §8 examples end-to-end
 ```
 
-Expected runtime on commodity hardware (i7 8-core, no GPU): ~[TBD] minutes.
+Expected runtime on commodity hardware (i7 8-core, no GPU): the three C++
+case-study examples finish in seconds; the full end-to-end sweep (catalog
++ holdout) is on the order of a couple of hours, dominated by the pymoo
+baselines (IDC itself is sub-second per seed).
 The script regenerates every results CSV, every plot, and the holdout
 validation cross-table.
 

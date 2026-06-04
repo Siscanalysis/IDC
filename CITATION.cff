@@ -34,7 +34,7 @@ references:
   - type: software
     title: OpenNN
     repository-code: "https://github.com/Artelnics/opennn"
-    version: "[TBD — set when the paper is accepted, in lockstep with cmake/FindOrFetchOpenNN.cmake]"
+    version: "v1.0-IDC-paper"
 preferred-citation:
   type: article
   authors:

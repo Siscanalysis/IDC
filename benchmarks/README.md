@@ -91,7 +91,9 @@ python aggregate_21seeds.py        # produces all_problems_21seeds.csv
 python make_figures.py             # regenerates the figures in §8
 ```
 
-Expected runtime on commodity hardware (i7 8-core): ~[TBD] hours.
+Expected runtime on commodity hardware (i7 8-core): on the order of a
+couple of hours, dominated by the pymoo baselines (~20 s per seed); IDC
+itself runs in well under a second per seed.
 
 ## Optional dependencies
 

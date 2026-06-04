@@ -14,7 +14,7 @@ you can open them directly without running any fetch step.
 | `moeed13/`                 | 8.3                      | `moeed13_sample.csv` (200-row sample, 32 KB) | Walters–Sheblé 1993 + Abido 2003 (simulator) | coefficients in-paper; generator MIT |
 | `bbob/`                    | 8.2 / 7.3                | none (analytical) | COCO / BBOB | BSD-3 |
 | `olympus/`                 | catalog (`run_olympus.py`) | none (fetched on demand) | Olympus | MIT |
-| `oer_plates/`              | catalog (`additional/`)  | [TBD] | [TBD upstream attribution] | [TBD] |
+| `oer_plates/`              | catalog (`additional/`)  | none (fetched via Olympus) | Olympus / Häse et al. 2021 | MIT |
 
 Each folder carries a **`SOURCE.md`** with the full citation, license,
 and BibTeX — please cite the original dataset paper(s) when you reuse the

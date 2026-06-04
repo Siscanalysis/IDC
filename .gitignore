@@ -1,0 +1,57 @@
+# Build artifacts
+build/
+build-*/
+out/
+*.obj
+*.o
+*.a
+*.lib
+*.so
+*.dylib
+*.dll
+*.exe
+
+# CMake
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+CTestTestfile.cmake
+Testing/
+_deps/
+
+# IDE
+.vs/
+.vscode/
+.idea/
+*.user
+
+# Python (used by benchmarks/)
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+.pytest_cache/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Reproduction outputs
+benchmarks/results/
+benchmarks/**/results/
+examples/**/result.csv
+examples/**/output/
+*.log
+
+# LaTeX (in case the paper is mirrored here later)
+*.aux
+*.bbl
+*.blg
+*.fls
+*.fdb_latexmk
+*.synctex.gz
+
+# Internal working data (age-28 experiment): large regenerable CSVs + logs.
+# Not part of the public companion; reproduce via examples/ + benchmarks/.
+experiments/

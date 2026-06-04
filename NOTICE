@@ -1,0 +1,28 @@
+IDC — Iterative Domain Contraction for Neural-Network Response Optimization
+Public companion to the paper "Neural network response optimization via
+iterative domain contraction" (Scala, Lopez, Assumpção, Dewil).
+
+================================================================================
+Funding acknowledgment
+================================================================================
+
+Funded by the European Union (Marie Skłodowska-Curie Grant Agreement
+no. 101169541 — NEUTEN). Views and opinions expressed are however those of
+the author(s) only and do not necessarily reflect those of the European Union
+or the European Research Executive Agency (REA). Neither the European Union
+nor the granting authority can be held responsible for them.
+
+================================================================================
+Third-party components
+================================================================================
+
+This project depends on and links against OpenNN (https://github.com/Artelnics/opennn),
+an open-source neural-networks C++ library released under the GNU Lesser General
+Public License v3.0 (LGPL-3.0-or-later). OpenNN is fetched at build time and is
+not redistributed in this repository; see cmake/FindOrFetchOpenNN.cmake.
+
+This project is itself released under LGPL-3.0-or-later (see LICENSE), matching
+OpenNN.
+
+Benchmark datasets shipped under data/ retain their upstream licenses and
+citations; see the per-dataset SOURCE.md files.

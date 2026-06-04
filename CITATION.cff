@@ -1,0 +1,52 @@
+cff-version: 1.2.0
+message: >-
+  If you use this software, please cite the paper and the
+  pinned OpenNN release listed below.
+type: software
+title: "IDC — Iterative Domain Contraction (paper companion)"
+authors:
+  - given-names: Simone
+    family-names: Scala
+    orcid: "https://orcid.org/0009-0005-6403-2815"
+    affiliation: "Artelnics; KU Leuven"
+  - given-names: Roberto
+    family-names: Lopez
+    affiliation: "Artelnics"
+  - given-names: José Matias
+    family-names: Assumpção
+    orcid: "https://orcid.org/0000-0002-1094-6145"
+    affiliation: "KU Leuven"
+  - given-names: Raf
+    family-names: Dewil
+    orcid: "https://orcid.org/0000-0003-4717-5484"
+    affiliation: "KU Leuven"
+repository-code: "https://github.com/Siscanalysis/IDC"
+license: LGPL-3.0-or-later
+keywords:
+  - data-driven optimization
+  - neural network surrogate
+  - derivative-free optimization
+  - response surface methodology
+  - multi-objective optimization
+  - Pareto front
+  - constraint handling
+references:
+  - type: software
+    title: OpenNN
+    repository-code: "https://github.com/Artelnics/opennn"
+    version: "[TBD — set when the paper is accepted, in lockstep with cmake/FindOrFetchOpenNN.cmake]"
+preferred-citation:
+  type: article
+  authors:
+    - given-names: Simone
+      family-names: Scala
+    - given-names: Roberto
+      family-names: Lopez
+    - given-names: José Matias
+      family-names: Assumpção
+    - given-names: Raf
+      family-names: Dewil
+  title: "Neural network response optimization via iterative domain contraction"
+  journal: "Advances in Computational Science and Engineering"
+  year: 2026
+  notes: "Under review"

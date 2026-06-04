@@ -1,0 +1,70 @@
+schema_version: 1
+dataset: "Olympus photo_pce10 (quaternary OPV photostability)"
+section: "8.4"
+description: >
+  Minimize measured photo-degradation of a four-component OPV blend on the
+  3-simplex (mass fractions sum to 1), under the donor-processability band
+  reported by Langner et al. 2020 (pure-donor / pure-acceptor films do not
+  form a usable bulk heterojunction). Inputs are the four mass fractions;
+  the surrogate predicts the normalized post-ageing efficiency drop.
+  Matches Equation (eq:pce10_objective) / (eq:pce10_simplex) of the paper.
+official_benchmark: true
+
+# Column names match data/photo_pce10/photo_pce10.csv.
+# mat_1=PCE10, mat_2=P3HT (donors); mat_3=PCBM, mat_4=oIDTBR (acceptors).
+inputs:
+  - name: mat_1
+    type: continuous
+    bounds: [0.0, 1.0]
+    notes: "PCE10 donor mass fraction."
+  - name: mat_2
+    type: continuous
+    bounds: [0.0, 1.0]
+    notes: "P3HT donor mass fraction."
+  - name: mat_3
+    type: continuous
+    bounds: [0.0, 1.0]
+    notes: "PCBM acceptor mass fraction."
+  - name: mat_4
+    type: continuous
+    bounds: [0.0, 1.0]
+    notes: "oIDTBR acceptor mass fraction."
+
+outputs:
+  - name: degradation
+    goal: minimize
+    source: nn_prediction
+    notes: "Normalized post-ageing efficiency drop in [0,1]; lower is better."
+
+formula_constraints:
+  # (1) Simplex equality: the four mass fractions sum to 1. This is the
+  # constraint IDC repairs with its affine-repair operator in one pass.
+  - name: simplex_sum_to_one
+    expr: "mat_1 + mat_2 + mat_3 + mat_4"
+    shape: affine
+    scope: inputs
+    relation: "=="
+    value: 1.0
+    tolerance: 1.0e-3
+    required: true
+    notes: "x_1 + x_2 + x_3 + x_4 = 1, x_i >= 0 (paper Eq. eq:pce10_simplex)."
+
+  # (2) Donor-processability band: the total donor fraction (PCE10 + P3HT)
+  # must lie in [1/6, 5/6]. Pure-donor or pure-acceptor films do not form a
+  # usable bulk heterojunction (Langner et al. 2020).
+  - name: donor_band_lower
+    expr: "mat_1 + mat_2"
+    shape: affine
+    scope: inputs
+    relation: ">="
+    value: 0.16666666666666666
+    required: true
+    notes: "x_PCE10 + x_P3HT >= 1/6 (paper Eq. eq:pce10_objective)."
+  - name: donor_band_upper
+    expr: "mat_1 + mat_2"
+    shape: affine
+    scope: inputs
+    relation: "<="
+    value: 0.8333333333333334
+    required: true
+    notes: "x_PCE10 + x_P3HT <= 5/6 (paper Eq. eq:pce10_objective)."

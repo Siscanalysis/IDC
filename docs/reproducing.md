@@ -1,0 +1,232 @@
+# Reproducing the paper
+
+This document gives the exact recipe to reproduce every numeric result
+and figure in §8 of the paper from a clean clone of this repository.
+
+For the conceptual overview of IDC, see [architecture.md](architecture.md).
+For the held-out validation protocol used in the §8.4 / §8.5
+real-application case studies, see
+[holdout_procedure.md](holdout_procedure.md).
+
+---
+
+## Prerequisites
+
+- **C++20 toolchain** (OpenNN requires C++20). Tested on:
+  - Windows: MSVC 19.3x (Visual Studio 2022)
+  - Linux: GCC 11+ or Clang 14+
+  - macOS: Apple Clang 14+
+- **CMake ≥ 3.20.**
+- **Git** (the build fetches OpenNN via `FetchContent`; the default ref is
+  the `dev-refactor` branch that carries the `ResponseOptimization` API —
+  see [`cmake/FindOrFetchOpenNN.cmake`](../cmake/FindOrFetchOpenNN.cmake)).
+  Eigen ships vendored inside the OpenNN repository, so no submodule step
+  is needed.
+
+> **MSVC note.** Building the full OpenNN static library from source can be
+> heavy on MSVC. If the link step is slow or fails, point the build at a
+> prebuilt local checkout instead with
+> `cmake -DOPENNN_ROOT=/path/to/opennn ..` (tier 1 of FindOrFetchOpenNN).
+- **Python ≥ 3.10** (only for `benchmarks/` aggregation and figure scripts).
+
+For the Python side, install dependencies with:
+
+```bash
+cd benchmarks
+python -m venv .venv
+source .venv/bin/activate     # Windows: .venv\Scripts\activate
+pip install -r requirements.txt
+```
+
+---
+
+## Step 1 — Clone and configure
+
+```bash
+git clone https://github.com/Siscanalysis/IDC.git
+cd IDC
+mkdir build && cd build
+cmake -DCMAKE_BUILD_TYPE=Release ..
+```
+
+On first configuration, CMake downloads the pinned OpenNN release
+(`OPENNN_DEFAULT_TAG` in [`cmake/FindOrFetchOpenNN.cmake`](../cmake/FindOrFetchOpenNN.cmake))
+into `build/_deps/opennn-src/`. To pin a different OpenNN version:
+
+```bash
+cmake -DOPENNN_TAG=<tag> -DCMAKE_BUILD_TYPE=Release ..
+```
+
+To use a local OpenNN checkout instead (useful if you are developing both):
+
+```bash
+cmake -DOPENNN_ROOT=/path/to/local/opennn -DCMAKE_BUILD_TYPE=Release ..
+```
+
+---
+
+## Step 2 — Build
+
+```bash
+cmake --build . --config Release -j
+```
+
+Expected build time: ~[TBD] minutes on a recent 8-core CPU.
+
+---
+
+## IDC configuration and evaluation budget (paper §8.1)
+
+These are the hyperparameters the §8 results are reported at. The
+runner defaults reproduce them; the switches documented in
+[`../benchmarks/README.md`](../benchmarks/README.md) let you change them
+to explore configurations **not** shown in the paper.
+
+**IDC default configuration** (all §8 results unless noted):
+
+| Parameter | Symbol | Value |
+|-----------|--------|-------|
+| Candidates per iteration | `N` | 2000 |
+| Zoom factor | `γ` | 0.85 |
+| Max iterations (per-problem) | `I_max` | 5 to 20 |
+| Min iterations before termination | `I_min` | 4 |
+| Relative termination tolerance | `τ` | 1e-6 |
+| Affine repair | — | every iteration |
+
+For the multi-objective continuous-front problems (CONSTR / ZDT1,
+discussed in §6 termination) the configuration is reduced to `N = 200`,
+`I_max = 3` — a temporary setting flagged in the paper as under study in
+the follow-up project.
+
+**Evaluation budget and seeds:**
+
+| Case | § | Budget / seed | Seeds |
+|------|---|---------------|-------|
+| photo_pce10 (SO real) | 8.4 | 40,000 surrogate calls | 21 |
+| MOEED13 (simulator MO) | 8.3 | 40,000 surrogate calls | 21 |
+| concrete_uci_mo (MO real) | 8.5 | 40,000 surrogate calls (IDC side caps the empirical Pareto front at 10,000 points) | 21 |
+| BBOB bi-objective mixed-integer | 8.2 | COCO-recommended schedule; dims n_c ∈ {5,10,20,40,80,160}, 15 instances/cell | 21 |
+
+**Baselines** (all run against the *same* trained surrogate as IDC, at
+the matched budget): single-objective — CMA-ES via `pycma`, plus DE, GA,
+PSO via `pymoo`; multi-objective — NSGA-II, NSGA-III, MOEA/D via `pymoo`.
+
+**Held-out protocol** (the two real-application cases, §8.4 / §8.5):
+top-5% by objective held out, `S = 5` surrogate-training seeds, 80%
+subsample of the remaining rows, 5 × 21 = 105 runs per algorithm. See
+[holdout_procedure.md](holdout_procedure.md).
+
+---
+
+## Step 3 — Run a single example
+
+The two real-application C++ case studies are built into `bin/`. To
+reproduce just §8.4 (photo_pce10, single-objective):
+
+```bash
+./bin/photo_pce10
+```
+
+The executable writes `examples/photo_pce10/result.csv` containing
+the IDC-recommended input configuration and the corresponding surrogate
+output. Compare to the headline number in the §8.4 table of the paper.
+
+The four headline §8 examples map to the following entry points:
+
+| § | Example | Entry point | Block |
+|---|---------|-------------|-------|
+| 8.2 | BBOB bi-objective mixed-integer | `python benchmarks/bbob/run_bbob_suites.py` | Validation (analytical) |
+| 8.3 | MOEED13 economic-emission dispatch | `./bin/moeed13` | Validation (simulator) |
+| 8.4 | photo_pce10 | `./bin/photo_pce10` | Real application (SO) |
+| 8.5 | concrete_uci_mo | `./bin/concrete_uci_mo` | Real application (MO) |
+
+The §8.2 BBOB validation is Python-only (analytical functions, no
+surrogate); the other three are OpenNN C++ executables.
+
+---
+
+## Step 4 — Run the validation sweeps and the full catalog
+
+The validation block and the broader catalog are driven from
+`benchmarks/`:
+
+```bash
+cd benchmarks
+python bbob/run_bbob_suites.py   # §8.2 analytical validation (default suite)
+python bbob/run_bbob_stress.py   # §7.3 f15–f24 hard-multimodal stress test
+python run_olympus.py            # §8.4 photo_pce10 (Olympus real-data SO)
+python run_idc_21seeds.py        # full catalog, 21 seeds each
+python aggregate_21seeds.py      # per-problem + combined summaries
+python make_figures.py           # figures used in §8
+```
+
+Expected total runtime on commodity hardware: ~[TBD] hours.
+
+Per-problem CSVs land in `benchmarks/results/branch_a/<problem>_idc.csv`;
+aggregated summaries land in
+`benchmarks/results/branch_a/all_problems_21seeds.csv`.
+
+### Reproducing problems not shown in the paper
+
+The manuscript shows one BBOB suite and one Olympus task. The runners
+expose switches for the rest of the catalog (see
+[`../benchmarks/README.md`](../benchmarks/README.md)):
+
+```bash
+python bbob/run_bbob_suites.py --suite bbob-mixint   # another COCO suite
+python bbob/run_bbob_stress.py --dimensions 5 20 40  # extra dimensions
+python run_olympus.py --task snar                    # another Olympus task
+```
+
+Each runner prints a `[note]` line when asked for something outside the
+paper's reported scope.
+
+---
+
+## Step 5 — One-shot reproduction script
+
+For convenience, every step above is wrapped in:
+
+```bash
+./scripts/reproduce_paper.sh
+```
+
+This runs: (1) build, (2) the two real-application C++ examples
+(photo_pce10 §8.4, concrete_uci_mo §8.5) and the MOEED13 simulator
+example (§8.3), (3) the BBOB analytical validation (§8.2) and the
+f15–f24 stress test (§7.3), (4) the full catalog sweep, (5) the held-out
+validation for the real-application cases, and (6) figure generation. The
+script is idempotent — re-running it skips steps whose outputs already
+exist and are up to date.
+
+---
+
+## Verifying the output
+
+Each example folder ships an `expected_output.csv`. After running an
+example, run:
+
+```bash
+python scripts/compare_outputs.py examples/<name>/
+```
+
+This compares the freshly produced `result.csv` against
+`expected_output.csv` element-wise with a tolerance of 1e-5 on inputs
+and 1e-3 on outputs. Differences are reported with the relative gap.
+
+If you used the default `OPENNN_TAG` and the same compiler family,
+the outputs should match exactly; minor floating-point drift across
+compiler vendors is expected and absorbed by the tolerance.
+
+---
+
+## Troubleshooting
+
+- **FetchContent download fails.** Set `OPENNN_ROOT` to a local
+  checkout and skip the download.
+- **Linker error against `opennn`.** Confirm you are using the
+  pinned tag; older or newer tags may have incompatible APIs.
+- **Different headline numbers.** The numbers in the paper are
+  reported as mean ± std across 21 seeds; single-seed runs of the
+  worked examples will differ slightly. To match the paper exactly,
+  run the full sweep via `./scripts/reproduce_paper.sh`.

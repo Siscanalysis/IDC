@@ -1,0 +1,142 @@
+# concrete_uci_mo.yaml — IDC-side problem definition for the MO reformulation
+# of UCI Concrete (max strength, min cement). Variable names match the SO
+# surrogate's training-data columns (cement, slag, fly_ash, water, sp,
+# coarse_agg, fine_agg, age — short forms). The SO surrogate is reused;
+# the cement minimization objective is a passthrough on the cement input
+# variable.
+
+problem:
+  name: concrete_uci_mo
+  type: multi_objective
+  source: "UCI Concrete Compressive Strength (Yeh 1998), reformulated as bi-objective: max strength vs min cement."
+
+dataset:
+  type: real_data
+  source: concrete_uci_training_data
+  surrogate_nn: "C:/Users/Artelnics/Desktop/benchmark_datasets/mo_realdata/C_materials_doe/concrete_uci_mo/nn/concrete_uci_nn.json"
+  notes: "Reuses the SO concrete_uci surrogate (1 output: strength). The cement objective is a passthrough on the cement input variable."
+
+inputs:
+  - { name: cement,     bounds: [102.0, 540.0], units: kg/m^3 }
+  - { name: slag,       bounds: [0.0, 360.0],   units: kg/m^3 }
+  - { name: fly_ash,    bounds: [0.0, 200.0],   units: kg/m^3 }
+  - { name: water,      bounds: [122.0, 247.0], units: kg/m^3 }
+  - { name: sp,         bounds: [0.0, 32.0],    units: kg/m^3 }
+  - { name: coarse_agg, bounds: [801.0, 1145.0], units: kg/m^3 }
+  - { name: fine_agg,   bounds: [594.0, 992.0], units: kg/m^3 }
+  - { name: age,        bounds: [28.0, 28.0],   units: days, notes: "Fixed at 28 days per standard strength protocol." }
+
+objectives:
+  - { variable: strength, direction: maximize, source: nn_output }
+  - { variable: cement,   direction: minimize, source: passthrough_input,
+      notes: "Second objective is the cement input itself; no NN call required." }
+
+constraints:
+  - name: water_cement_ratio_lower
+    type: linear_inequality
+    coefficients: { water: 1, cement: -0.30 }
+    lower: 0.0
+    notes: "water - 0.30 * cement >= 0  (practical mix: w/c >= 0.30)"
+  - name: water_cement_ratio_upper
+    type: linear_inequality
+    coefficients: { water: 1, cement: -0.70 }
+    upper: 0.0
+    notes: "water - 0.70 * cement <= 0  (practical mix: w/c <= 0.70)"
+  - name: mass_balance
+    type: linear_inequality
+    coefficients: { cement: 1, slag: 1, fly_ash: 1, water: 1, sp: 1, coarse_agg: 1, fine_agg: 1 }
+    lower: 2200.0
+    upper: 2600.0
+    notes: "Total mix density ~ 2400 kg/m^3 (engineering tolerance [2200, 2600])."
+  # ---- 2026-06-01 revision: general-purpose institutional constraints ----
+  # Replaces the earlier strength-focused ACI 233R / FHWA bounds with general-
+  # purpose limits from EN 206 + ASTM C595, which do not assume a specific
+  # concrete application (HPC vs structural vs mass). Sanity-audited against
+  # Yeh 1998: 100/100/92.1% individual pass; combined with the existing
+  # constraints excludes zero additional rows.
+  - name: binder_min_en206
+    type: linear_inequality
+    coefficients: { cement: 1, slag: 1, fly_ash: 1 }
+    lower: 200.0
+    notes: "Total binder >= 200 kg/m^3. BS EN 206 / BS 8500 minimum cement-or-combination content for X0/no-risk class — generic floor that applies to any structural concrete."
+  - name: slag_replacement_max_astm_c595
+    type: linear_inequality
+    coefficients: { slag: 0.30, cement: -0.70, fly_ash: -0.70 }
+    upper: 0.0
+    notes: "slag <= 0.70 * (cement + slag + fly_ash). ASTM C595 Type IS (Portland blast-furnace slag cement, general construction) — accepts up to 70% slag content in the blended cement."
+  - name: fly_ash_replacement_max_astm_c595
+    type: linear_inequality
+    coefficients: { fly_ash: 0.60, cement: -0.40, slag: -0.40 }
+    upper: 0.0
+    notes: "fly_ash <= 0.40 * (cement + slag + fly_ash). ASTM C595 Type IP (Portland-pozzolan cement, general construction) modern revision — caps pozzolan replacement at 40%."
+  # An output-side `strength_cap_no_extrapolation` (strength <= 100 MPa) was
+  # tried symmetrically on both IDC and pymoo on 2026-06-01 PM. Result: cap
+  # dropped NSGA-II HV by only −4.7% and NSGA-III by −3.1%, leaving NSGA-II
+  # still ahead by +33% on HV — most of pymoo's extrapolation HV came from
+  # the [82.6, 100] MPa band, not the [100, 110] tail. Cap removed; the
+  # project's top-X% holdout-surrogate methodology (BENCHMARKING_PROCEDURE
+  # §2) is the documented correct tool for suppressing NN extrapolation.
+  # The problem_pymoo.py support for `scope: outputs` stays — useful for
+  # future MO entries where the output cap is structurally meaningful.
+
+# C++ IDC driver reads these as formula_constraints (legacy schema). Mirrored
+# above as constraints for the python run_pymoo.py reader.
+formula_constraints:
+  - name: water_cement_ratio_lower
+    expr: "water - 0.30 * cement"
+    shape: affine
+    scope: inputs
+    relation: ">="
+    value: 0.0
+    required: true
+  - name: water_cement_ratio_upper
+    expr: "water - 0.70 * cement"
+    shape: affine
+    scope: inputs
+    relation: "<="
+    value: 0.0
+    required: true
+  - name: mass_balance
+    expr: "cement + slag + fly_ash + water + sp + coarse_agg + fine_agg"
+    shape: affine
+    scope: inputs
+    relation: "in"
+    value: [2200.0, 2600.0]
+    tolerance: 0
+    required: true
+  # ---- 2026-06-01 revision: EN 206 + ASTM C595 general-purpose set ----
+  - name: binder_min_en206
+    expr: "cement + slag + fly_ash"
+    shape: affine
+    scope: inputs
+    relation: ">="
+    value: 200.0
+    required: true
+  - name: slag_replacement_max_astm_c595
+    expr: "0.30*slag - 0.70*cement - 0.70*fly_ash"
+    shape: affine
+    scope: inputs
+    relation: "<="
+    value: 0.0
+    required: true
+  - name: fly_ash_replacement_max_astm_c595
+    expr: "0.60*fly_ash - 0.40*cement - 0.40*slag"
+    shape: affine
+    scope: inputs
+    relation: "<="
+    value: 0.0
+    required: true
+  # Note: an output-side strength cap (strength <= 100) was tried and removed.
+  # The holdout-surrogate methodology (§8 holdout protocol) is the right tool
+  # to suppress surrogate-extrapolation hallucinations: training with the top
+  # 5% strength rows held out prevents the surrogate from learning to predict
+  # near-record values, and pymoo's extrapolation peak naturally disappears.
+
+budget:
+  total_nn_evaluations: 40000
+  idc_per_iteration: 200
+  idc_max_iterations: 3
+
+seeds:
+  count: 21
+  base: 42

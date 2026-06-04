@@ -1,0 +1,80 @@
+# MOEED-13 — Multi-objective Economic Emission Dispatch.
+# Same Walters & Sheblé 1993 13 generator units as ELD-13, plus a NOx emission
+# function as a second objective. Both objectives minimized simultaneously.
+#
+# Cost: identical to ELD-13 (a + b*P + c*P^2 + |e*sin(f*(P_min - P))| per unit)
+# Emission: per-type quadratic E_i = α_i + β_i*P_i + γ_i*P_i^2 (lb/h NOx)
+# Demand: 1800 ± 0.5 MW (same power-balance band)
+#
+# Note: The 13-unit MOEED is less standardized than 6-unit Abido (2003).
+# Emission coefficients here follow the "type-based" parameterization common
+# in MOEED papers (large efficient units have higher α but lower γ; small
+# peakers have lower α but higher γ — creating a real cost/emission tradeoff
+# since cost-cheap large units emit more). For paper publication, swap in
+# exact coefficients from a specific cited paper (e.g., Basu 2008, Reza 2019).
+
+problem:
+  name: moeed13
+  type: multi_objective
+  source: "Walters & Sheblé (1993) ELD-13 cost + type-based quadratic NOx emission model. Pairing rationale: extends the SO Branch-B problem to MO Branch-B without changing the physics or constraint structure."
+
+dataset:
+  type: synthetic
+  source: moeed13_cost_and_emission
+  n_samples: 100000
+  lhs_seed: 7
+
+inputs:
+  - { name: P_0,  bounds: [  0.0, 680.0] }
+  - { name: P_1,  bounds: [  0.0, 360.0] }
+  - { name: P_2,  bounds: [  0.0, 360.0] }
+  - { name: P_3,  bounds: [ 60.0, 180.0] }
+  - { name: P_4,  bounds: [ 60.0, 180.0] }
+  - { name: P_5,  bounds: [ 60.0, 180.0] }
+  - { name: P_6,  bounds: [ 60.0, 180.0] }
+  - { name: P_7,  bounds: [ 60.0, 180.0] }
+  - { name: P_8,  bounds: [ 60.0, 180.0] }
+  - { name: P_9,  bounds: [ 40.0, 120.0] }
+  - { name: P_10, bounds: [ 40.0, 120.0] }
+  - { name: P_11, bounds: [ 55.0, 120.0] }
+  - { name: P_12, bounds: [ 55.0, 120.0] }
+
+constraints:
+  - name: power_balance
+    type: linear_inequality
+    coefficients:
+      P_0: 1
+      P_1: 1
+      P_2: 1
+      P_3: 1
+      P_4: 1
+      P_5: 1
+      P_6: 1
+      P_7: 1
+      P_8: 1
+      P_9: 1
+      P_10: 1
+      P_11: 1
+      P_12: 1
+    lower: 1799.5
+    upper: 1800.5
+
+objectives:
+  - { variable: total_cost,     direction: minimize }
+  - { variable: total_emission, direction: minimize }
+
+# No analytical Pareto front (constrained MO with valve-point + quadratic
+# emission — front is not closed-form). Reference will be the union front
+# from a large NSGA-II run (50k evals × 21 seeds via the analytical function).
+known_pareto_front:
+  type: empirical_reference
+  source: "Built by running NSGA-II directly on the analytical cost+emission with a high budget; the resulting non-dominated set is used as IGD reference for IDC and surrogate-based runs."
+
+budget:
+  total_nn_evaluations: 40000
+  idc_per_iteration: 2000
+  idc_max_iterations: 20
+
+seeds:
+  count: 11
+  base: 42

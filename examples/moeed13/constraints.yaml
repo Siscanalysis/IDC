@@ -1,0 +1,96 @@
+schema_version: 1
+dataset: "MOEED13 (Walters-Sheble 13-unit bus + Abido NOx, bi-objective)"
+section: "8.3"
+description: >
+  Bi-objective valve-point economic-emission dispatch over the 13-unit
+  Walters-Sheble (1993) bus: choose the 13 power setpoints to minimize
+  both hourly fuel cost (valve-point quadratic) and NOx emission (Abido
+  2003 cubic-plus-exponential), subject to per-unit box bounds and the
+  system power-balance equality. Both objectives are closed-form simulator
+  outputs (no measurement data). Matches Equation (eq:moeed13_problem) of
+  the paper.
+official_benchmark: false   # simulator-grounded; coefficient tables are real (WS1993 / Abido2003).
+
+# Column names match data/moeed13/moeed13_sample.csv (P_0..P_12).
+# Per-unit bounds are the Walters-Sheble 1993 Table I limits.
+inputs:
+  - name: P_0
+    type: continuous
+    bounds: [0.0, 680.0]
+    units: MW
+  - name: P_1
+    type: continuous
+    bounds: [0.0, 360.0]
+    units: MW
+  - name: P_2
+    type: continuous
+    bounds: [0.0, 360.0]
+    units: MW
+  - name: P_3
+    type: continuous
+    bounds: [60.0, 180.0]
+    units: MW
+  - name: P_4
+    type: continuous
+    bounds: [60.0, 180.0]
+    units: MW
+  - name: P_5
+    type: continuous
+    bounds: [60.0, 180.0]
+    units: MW
+  - name: P_6
+    type: continuous
+    bounds: [60.0, 180.0]
+    units: MW
+  - name: P_7
+    type: continuous
+    bounds: [60.0, 180.0]
+    units: MW
+  - name: P_8
+    type: continuous
+    bounds: [60.0, 180.0]
+    units: MW
+  - name: P_9
+    type: continuous
+    bounds: [40.0, 120.0]
+    units: MW
+  - name: P_10
+    type: continuous
+    bounds: [40.0, 120.0]
+    units: MW
+  - name: P_11
+    type: continuous
+    bounds: [55.0, 120.0]
+    units: MW
+  - name: P_12
+    type: continuous
+    bounds: [55.0, 120.0]
+    units: MW
+
+outputs:
+  - name: total_cost
+    goal: minimize
+    units: "$ / h"
+    source: simulator
+    notes: "obj_1 = sum_i [a_i + b_i P_i + c_i P_i^2 + |e_i sin(f_i (P_min,i - P_i))|]. Walters-Sheble 1993 valve-point cost (Table I)."
+  - name: total_emission
+    goal: minimize
+    units: "lb / h"
+    source: simulator
+    notes: "obj_2 = sum_i [alpha_i + beta_i P_i + gamma_i P_i^2 + xi_i exp(lambda_i P_i)]. Abido 2003 NOx model."
+
+formula_constraints:
+  - name: power_balance
+    expr: "P_0 + P_1 + P_2 + P_3 + P_4 + P_5 + P_6 + P_7 + P_8 + P_9 + P_10 + P_11 + P_12"
+    shape: affine
+    scope: inputs
+    relation: "in"
+    value: [1799.5, 1800.5]
+    required: true
+    notes: >
+      |sum_i P_i - D_total| <= 0.5 MW, with D_total = 1800 MW (the standard
+      demand level reported in paper Eq. eq:moeed13_problem). Encoded as an
+      interval to express the +/- 0.5 MW tolerance. NOTE: the training table
+      is box-sampled per [P_min,i, P_max,i] and does NOT itself satisfy this
+      equality; the constraint is enforced at optimization time via IDC's
+      affine repair (pymoo uses a constraint-violation penalty).

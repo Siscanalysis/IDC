@@ -1,0 +1,54 @@
+# Olympus photo_pce10 (Hase et al. 2021) — real lab campaign.
+# 4 continuous inputs, 1 target (degradation, MINIMIZE). 1040 samples.
+
+problem:
+  name: photo_pce10
+  type: single_objective
+  source: "Hase, F., Aldeghi, M., Hickman, R. J., Roch, L. M., & Aspuru-Guzik, A. (2021). Olympus: a benchmarking framework for noisy optimization and experiment planning. arXiv:2010.04153."
+
+dataset:
+  type: real_csv
+  path: "C:/Users/Artelnics/Desktop/benchmark_datasets/so_realdata/P_olympus_campaigns/olympus_photo_pce10/data/photo_pce10.csv"
+  target_column: degradation
+  n_samples: 1040
+
+inputs:
+  - { name: mat_1             , bounds: [0.0, 1.0] }
+  - { name: mat_2             , bounds: [0.0, 1.0] }
+  - { name: mat_3             , bounds: [0.0, 1.0] }
+  - { name: mat_4             , bounds: [0.0, 1.0] }
+
+constraints:
+  # Simplex equality (mat_1+...+mat_4 = 1) encoded as a tight linear
+  # band: 1.0 <= sum <= 1.0, which generates two ineq constraints.
+  - name: simplex
+    type: linear_inequality
+    coefficients: { mat_1: 1.0, mat_2: 1.0, mat_3: 1.0, mat_4: 1.0 }
+    lower: 1.0
+    upper: 1.0
+  # Donor (PCE10 + P3HT) processability band from Langner 2020 Adv. Mater.:
+  # 1/6 <= mat_1 + mat_2 <= 5/6. Pure-acceptor / near-pure-donor films don't
+  # form a usable bulk-heterojunction in the experimental campaign, even
+  # though the Olympus surrogate happily extrapolates there.
+  - name: donor_band
+    type: linear_inequality
+    coefficients: { mat_1: 1.0, mat_2: 1.0 }
+    lower: 0.16666666666666666
+    upper: 0.83333333333333333
+
+objective:
+  variable: degradation
+  direction: minimize
+
+known_optimum:
+  f_star: 0.001622641
+  source: "Min observed degradation in the 1040-sample Olympus photo_pce10 campaign."
+
+budget:
+  total_nn_evaluations: 40000
+  idc_per_iteration: 2000
+  idc_max_iterations: 20
+
+seeds:
+  count: 21
+  base: 42

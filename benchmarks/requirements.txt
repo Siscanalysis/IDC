@@ -1,0 +1,15 @@
+# Python dependencies for the benchmark sweeps and figure generation.
+# Pinned loosely; the paper numbers were produced with the versions noted.
+
+numpy>=1.24            # required by every runner
+scipy>=1.10            # DE baseline in run_bbob_stress.py
+cma>=3.3               # CMA-ES (pycma) baseline
+pymoo>=0.6.1           # NSGA-II / NSGA-III / MOEA/D / DE / GA / PSO baselines
+matplotlib>=3.7        # make_figures.py
+pandas>=2.0            # aggregate_21seeds.py
+
+# Optional — only needed for specific runners:
+# cocoex               # official COCO binding for bbob/run_bbob_suites.py
+#                      # (may not build on the newest Python; see bbob/README.md)
+# olympus              # Olympus datasets for run_olympus.py
+#                      # (or drop a pre-exported CSV under data/olympus/<task>/)

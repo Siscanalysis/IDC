@@ -1,0 +1,25 @@
+                   GNU LESSER GENERAL PUBLIC LICENSE
+                       Version 3, 29 June 2007
+
+This software (IDC paper companion) is distributed under the terms of the
+GNU Lesser General Public License v3.0 or later (SPDX: LGPL-3.0-or-later).
+
+License chosen to match OpenNN's license (https://github.com/Artelnics/opennn),
+on which this repository depends, so that downstream users face a single,
+consistent license obligation.
+
+Full canonical license text:
+    https://www.gnu.org/licenses/lgpl-3.0.txt
+    https://www.gnu.org/licenses/lgpl-3.0.en.html
+
+Summary (informational, not a substitute for the canonical text):
+
+  You may freely use, modify, and redistribute this software under the
+  conditions of LGPL v3.0 or later. If you redistribute modified versions,
+  the modifications must also be released under LGPL v3.0 or later, and
+  must be clearly marked. Use of this software in a larger work does not
+  require that larger work to be released under LGPL v3.0, provided the
+  conditions in section 4 of the LGPL ("Combined Works") are met.
+
+Copyright (c) 2026 Simone Scala, Roberto Lopez, José Matias Assumpção,
+                   Raf Dewil, and the OpenNN contributors.

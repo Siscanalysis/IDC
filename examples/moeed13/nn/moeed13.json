@@ -1,0 +1,172 @@
+{
+  "NeuralNetwork": {
+    "Inputs": {
+      "InputsNumber": "13",
+      "Input": [
+        {
+          "Index": "1",
+          "Text": "P_0"
+        },
+        {
+          "Index": "2",
+          "Text": "P_1"
+        },
+        {
+          "Index": "3",
+          "Text": "P_2"
+        },
+        {
+          "Index": "4",
+          "Text": "P_3"
+        },
+        {
+          "Index": "5",
+          "Text": "P_4"
+        },
+        {
+          "Index": "6",
+          "Text": "P_5"
+        },
+        {
+          "Index": "7",
+          "Text": "P_6"
+        },
+        {
+          "Index": "8",
+          "Text": "P_7"
+        },
+        {
+          "Index": "9",
+          "Text": "P_8"
+        },
+        {
+          "Index": "10",
+          "Text": "P_9"
+        },
+        {
+          "Index": "11",
+          "Text": "P_10"
+        },
+        {
+          "Index": "12",
+          "Text": "P_11"
+        },
+        {
+          "Index": "13",
+          "Text": "P_12"
+        }
+      ]
+    },
+    "Layers": {
+      "LayersNumber": "6",
+      "Items": [
+        {
+          "Scaling": {
+            "Label": "",
+            "InputDimensions": "13",
+            "OutputDimensions": "13",
+            "Means": "339.0474853515625 179.82763671875 180.2180023193359 119.9321060180664 119.8867340087891 120.0542907714844 120.1289672851562 120.0245361328125 120.0306091308594 80.07328796386719 80.07717132568359 87.54183959960938 87.48485565185547",
+            "StandardDeviations": "196.1811218261719 104.0326766967773 103.8308181762695 34.6337890625 34.61748504638672 34.59856414794922 34.62709808349609 34.61387252807617 34.62865829467773 23.08079528808594 23.09114265441895 18.75576210021973 18.79171752929688",
+            "Minimums": "3.356486558914185e-05 3.688037395477295e-06 0.001154188066720963 60.00015640258789 60.00413131713867 60.00090789794922 60.00069046020508 60.00000762939453 60.00279998779297 40.00023651123047 40.000244140625 55.00069427490234 55.00018692016602",
+            "Maximums": "679.9771118164062 359.9986572265625 359.9930725097656 179.9993743896484 179.9996490478516 179.9995727539062 179.9977874755859 179.998779296875 179.9995880126953 119.9992218017578 119.99951171875 119.9992370605469 119.9999618530273",
+            "Scalers": "MeanStandardDeviation MeanStandardDeviation MeanStandardDeviation MeanStandardDeviation MeanStandardDeviation MeanStandardDeviation MeanStandardDeviation MeanStandardDeviation MeanStandardDeviation MeanStandardDeviation MeanStandardDeviation MeanStandardDeviation MeanStandardDeviation",
+            "MinRange": "-1",
+            "MaxRange": "1"
+          }
+        },
+        {
+          "Dense": {
+            "Label": "dense2d_layer_1",
+            "InputDimensions": "13",
+            "OutputDimensions": "100",
+            "Activation": "Tanh"
+          }
+        },
+        {
+          "Dense": {
+            "Label": "dense2d_layer_2",
+            "InputDimensions": "100",
+            "OutputDimensions": "50",
+            "Activation": "Tanh"
+          }
+        },
+        {
+          "Dense": {
+            "Label": "approximation_layer",
+            "InputDimensions": "50",
+            "OutputDimensions": "2",
+            "Activation": "Identity"
+          }
+        },
+        {
+          "Unscaling": {
+            "Label": "",
+            "InputDimensions": "2",
+            "OutputDimensions": "2",
+            "MinRange": "-1",
+            "MaxRange": "1",
+            "Neurons": [
+              {
+                "Descriptives": "10777.98046875 26338.8671875 18977.767578125 2201.353759765625",
+                "Scaler": "MeanStandardDeviation"
+              },
+              {
+                "Descriptives": "1623.319946289062 7136.93408203125 4214.71240234375 854.9671020507812",
+                "Scaler": "MeanStandardDeviation"
+              }
+            ]
+          }
+        },
+        {
+          "Bounding": {
+            "Label": "",
+            "InputDimensions": "2",
+            "OutputDimensions": "2",
+            "BoundingMethod": "NoBounding"
+          }
+        }
+      ],
+      "SourceLayers": {
+        "SourceLayer": [
+          {
+            "LayerIndex": "0",
+            "Text": "-1"
+          },
+          {
+            "LayerIndex": "1",
+            "Text": "0"
+          },
+          {
+            "LayerIndex": "2",
+            "Text": "1"
+          },
+          {
+            "LayerIndex": "3",
+            "Text": "2"
+          },
+          {
+            "LayerIndex": "4",
+            "Text": "3"
+          },
+          {
+            "LayerIndex": "5",
+            "Text": "4"
+          }
+        ]
+      }
+    },
+    "Outputs": {
+      "OutputsNumber": "2",
+      "Output": [
+        {
+          "Index": "1",
+          "Text": "total_cost"
+        },
+        {
+          "Index": "2",
+          "Text": "total_emission"
+        }
+      ]
+    }
+  }
+}

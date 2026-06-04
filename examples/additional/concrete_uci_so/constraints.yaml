@@ -1,0 +1,43 @@
+schema_version: 1
+dataset: "UCI Concrete Compressive Strength (SO: maximize strength)"
+section: "catalog (not in manuscript)"
+description: >
+  Single-objective view of the UCI Concrete dataset: maximize the
+  NN-predicted 28-day compressive strength, subject to the same six
+  input-side affine constraints as the §8.5 multi-objective sibling
+  (EN 206 / ASTM C595). Shares the surrogate and dataset with
+  examples/concrete_uci_mo; this entry only drops the cement objective.
+official_benchmark: false
+
+# Column names match data/concrete_uci/concrete_uci.csv. binder = cement + slag + fly_ash.
+inputs:
+  - { name: cement,     type: continuous, bounds: auto,      units: kg/m^3 }
+  - { name: slag,       type: continuous, bounds: auto,      units: kg/m^3 }
+  - { name: fly_ash,    type: continuous, bounds: auto,      units: kg/m^3 }
+  - { name: water,      type: continuous, bounds: auto,      units: kg/m^3 }
+  - { name: sp,         type: continuous, bounds: auto,      units: kg/m^3 }
+  - { name: coarse_agg, type: continuous, bounds: auto,      units: kg/m^3 }
+  - { name: fine_agg,   type: continuous, bounds: auto,      units: kg/m^3 }
+  - { name: age,        type: continuous, bounds: [1, 365],  units: days, fix_at: 28 }
+
+outputs:
+  - name: strength
+    goal: maximize
+    units: MPa
+    source: nn_prediction
+
+# Ordered most-reliable -> least-reliable; "data pass" audited against the 1030
+# Yeh-1998 rows (2026-06-02). Same six limits as the §8.5 MO sibling.
+formula_constraints:
+  - { name: mass_balance, expr: "cement + slag + fly_ash + water + sp + coarse_agg + fine_agg", shape: affine, scope: inputs, relation: "in", value: [2200, 2600], required: true,
+      notes: "Total mix density ~ 2400 kg/m^3. Data pass 99.7%. Most reliable (physical identity)." }
+  - { name: binder_floor, expr: "cement + slag + fly_ash", shape: affine, scope: inputs, relation: ">=", value: 200.0, required: true,
+      notes: "Minimum binder >= 200 — BS EN 206 / BS 8500. Data pass 100%." }
+  - { name: slag_replacement, expr: "slag - 0.70 * (cement + slag + fly_ash)", shape: affine, scope: inputs, relation: "<=", value: 0.0, required: true,
+      notes: "slag <= 0.70 * binder — ASTM C595 Type IS. Data pass 100%." }
+  - { name: water_cement_lower, expr: "water - 0.30 * cement", shape: affine, scope: inputs, relation: ">=", value: 0.0, required: true,
+      notes: "water/cement >= 0.30 (hydration minimum). Data pass 98.6%." }
+  - { name: fly_ash_replacement, expr: "fly_ash - 0.40 * (cement + slag + fly_ash)", shape: affine, scope: inputs, relation: "<=", value: 0.0, required: true,
+      notes: "fly_ash <= 0.40 * binder — ASTM C595 Type IP. Data pass 92.1% (data max 0.55)." }
+  - { name: water_cement_upper, expr: "water - 0.70 * cement", shape: affine, scope: inputs, relation: "<=", value: 0.0, required: true,
+      notes: "water/cement <= 0.70 (structural-grade design limit). Data pass 51.7% — binding constraint. Least reliable as data-envelope rule." }

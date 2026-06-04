@@ -34,10 +34,21 @@ int main(int argc, char** argv)
 {
     try
     {
-        const fs::path dir        = EXAMPLE_DIR;
-        const fs::path nn_json    = dir / "nn" / "photo_pce10.json";
-        const fs::path yaml_path  = dir / "problem.yaml";
-        const fs::path result_csv = dir / "result.csv";
+        const fs::path dir = EXAMPLE_DIR;
+        // CLI: --seed N (default 0); --nn <json> and --out <csv> let the
+        // held-out driver (benchmarks/holdout) run IDC on a freshly trained
+        // surrogate. Defaults reproduce the shipped full-data deployment run.
+        int seed = 0;
+        fs::path nn_json    = dir / "nn" / "photo_pce10.json";
+        fs::path result_csv = dir / "result.csv";
+        const fs::path yaml_path = dir / "problem.yaml";
+        for(int a = 1; a < argc; ++a)
+        {
+            const std::string s = argv[a];
+            if(s == "--seed" && a + 1 < argc)      seed = std::stoi(argv[++a]);
+            else if(s == "--nn" && a + 1 < argc)   nn_json = argv[++a];
+            else if(s == "--out" && a + 1 < argc)  result_csv = argv[++a];
+        }
 
         // Surrogate architecture: 4 inputs -> 15 hidden -> 1 output (degradation).
         ApproximationNetwork network({Index(4)}, Shape{Index(15)}, {Index(1)});
@@ -58,14 +69,6 @@ int main(int argc, char** argv)
             network.set_output_variables(vars_out);
         }
 
-        // Optimizer seed: --seed N (default 0). Used by run_idc_21seeds.py to
-        // sweep the 21 independent seeds of the §8.4 held-out protocol.
-        int seed = 0;
-        for(int a = 1; a < argc; ++a)
-        {
-            const std::string s = argv[a];
-            if(s == "--seed" && a + 1 < argc) seed = std::stoi(argv[++a]);
-        }
         opennn::set_seed(seed);
         ResponseOptimization opt(&network);
 
@@ -94,7 +97,10 @@ int main(int argc, char** argv)
 
         // Columns: [mat_1, mat_2, mat_3, mat_4, degradation].
         std::ofstream f(result_csv);
-        f << std::setprecision(9) << "mat_1,mat_2,mat_3,mat_4,degradation\n";
+        // 17 significant digits = exact IEEE-double round-trip (so the written
+        // point re-checks against the simplex/donor-band constraints to machine
+        // precision; used by benchmarks/baselines/run_baselines.py).
+        f << std::setprecision(17) << "mat_1,mat_2,mat_3,mat_4,degradation\n";
         for(Index i = 0; i < 4; ++i) f << results(0, i) << ",";
         f << results(0, 4) << "\n";
 

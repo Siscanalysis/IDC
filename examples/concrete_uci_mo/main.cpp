@@ -97,7 +97,10 @@ int main()
         // Each row is a Pareto point. Columns: [x_0..x_7, strength].
         // cement objective = the cement input column (x_0).
         std::ofstream f(result_csv);
-        f << std::setprecision(9)
+        // 17 significant digits = exact IEEE-double round-trip, so the written
+        // points re-check against the YAML constraints to machine precision
+        // (used by benchmarks/baselines/run_baselines.py for the IDC row).
+        f << std::setprecision(17)
           << "strength,cement,x_cement,x_slag,x_fly_ash,x_water,x_sp,x_coarse_agg,x_fine_agg,x_age\n";
         for(Index r = 0; r < n_pareto; ++r)
         {

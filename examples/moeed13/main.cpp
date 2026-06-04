@@ -96,7 +96,10 @@ int main()
 
         // Each row: [x_0..x_12, total_cost (col 13), total_emission (col 14)].
         std::ofstream f(result_csv);
-        f << std::setprecision(9) << "total_cost,total_emission";
+        // 17 significant digits = exact IEEE-double round-trip, so the written
+        // setpoints re-check against the power-balance constraint to machine
+        // precision (used by benchmarks/baselines/run_baselines.py).
+        f << std::setprecision(17) << "total_cost,total_emission";
         for(int i = 0; i < 13; ++i) f << ",P_" << i;
         f << "\n";
         for(Index r = 0; r < n_pareto; ++r)

@@ -40,6 +40,7 @@ if(IDC_BUILD_EXAMPLES)
     add_subdirectory(examples/moeed13)           # §8.3 Validation (simulator MO)
     add_subdirectory(examples/photo_pce10)       # §8.4 Real application (SO)
     add_subdirectory(examples/concrete_uci_mo)   # §8.5 Real application (MO)
+    add_subdirectory(benchmarks/holdout)         # §8.4 held-out surrogate trainer
 
     # Additional catalog examples (not shown in the manuscript). Their C++
     # drivers follow the same template; enable once their main.cpp land.

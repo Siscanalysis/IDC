@@ -73,15 +73,22 @@ SO_ALGORITHMS = {
 }
 
 
-def load_nn(example: str):
-    """Import the bundled self-contained numpy NN export for an example."""
-    nn_dir = EXAMPLES / example / "nn"
-    pys = sorted(nn_dir.glob("*.py"))
-    if not pys:
-        raise FileNotFoundError(
-            f"No exported NN .py in {nn_dir}; the pymoo baselines evaluate the "
-            f"surrogate through it.")
-    py = pys[0]
+def load_nn(example: str, override=None):
+    """Import the self-contained numpy NN export for an example, or, when
+    `override` is given, a specific exported NN .py (used by the held-out
+    driver to score a freshly trained surrogate)."""
+    if override is not None:
+        py = Path(override)
+        if not py.exists():
+            raise FileNotFoundError(f"--nn-py path not found: {py}")
+    else:
+        nn_dir = EXAMPLES / example / "nn"
+        pys = sorted(nn_dir.glob("*.py"))
+        if not pys:
+            raise FileNotFoundError(
+                f"No exported NN .py in {nn_dir}; the pymoo baselines evaluate the "
+                f"surrogate through it.")
+        py = pys[0]
     spec = importlib.util.spec_from_file_location(f"nn_{example}", py)
     mod = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(mod)
@@ -204,11 +211,14 @@ def idc_from_result(problem: OpennnProblem, example: str):
     constraints. Returns (so_row | mo_row, F, X) or None if result.csv is
     absent / its columns can't be matched (then run the C++ example first)."""
     rcsv = EXAMPLES / example / "result.csv"
+    note = "re-checked from result.csv"
     if not rcsv.exists():
         # fall back to the committed smoke-test reference if present
         rcsv = EXAMPLES / example / "expected_output.csv"
         if not rcsv.exists():
             return None
+        note = ("re-checked from committed expected_output.csv "
+                "(precision-limited; run the C++ example for an exact residual)")
     rows = list(csv.DictReader(open(rcsv, newline="")))
     if not rows:
         return None
@@ -233,7 +243,7 @@ def idc_from_result(problem: OpennnProblem, example: str):
         row = {"algorithm": "idc", "seed": 0, "n_pareto": int(X.shape[0]),
                "hv": float("nan"), "feasible_pct": 100.0 * nfeas / len(X),
                "mean_violation": float(np.mean(viols)),
-               "evals": 0, "walltime_s": 0.0, "notes": "re-checked from result.csv"}
+               "evals": 0, "walltime_s": 0.0, "notes": note}
         return row, None, None
     # SO: result.csv holds the single returned point (take the best by objective)
     best = min(X, key=lambda x: (problem.signed_objective(x)
@@ -244,7 +254,7 @@ def idc_from_result(problem: OpennnProblem, example: str):
     return ({"algorithm": "idc", "seed": 0,
              "best_f": float(f if isinstance(f, float) else f[0]),
              "feasible": ok, "max_violation": v, "evals": 0, "walltime_s": 0.0,
-             "notes": "re-checked from result.csv"}, None, None)
+             "notes": note}, None, None)
 
 
 def _write(rows: list[dict], path: Path) -> None:
@@ -267,6 +277,9 @@ def main() -> int:
                     help="run seeds 42..42+N-1 (overrides --seed)")
     ap.add_argument("--budget", type=int, default=40000)
     ap.add_argument("--out", type=Path, default=None)
+    ap.add_argument("--nn-py", type=Path, default=None, dest="nn_py",
+                    help="Override the surrogate .py (e.g. a held-out surrogate "
+                         "from benchmarks/holdout/train_surrogate).")
     args = ap.parse_args()
 
     yaml_path = EXAMPLES / args.example / "problem.yaml"
@@ -274,7 +287,7 @@ def main() -> int:
         print(f"[ERROR] no problem.yaml at {yaml_path}", file=sys.stderr)
         return 1
 
-    nn = load_nn(args.example)
+    nn = load_nn(args.example, args.nn_py)
     problem = OpennnProblem(yaml_path, nn)
     seeds = (list(range(42, 42 + args.seeds)) if args.seeds else [args.seed])
     out = args.out or (HERE / "results" / f"{args.example}_baselines.csv")

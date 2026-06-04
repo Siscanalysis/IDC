@@ -68,7 +68,8 @@ the rest stay in the catalog.
 ```bash
 # Single-objective catalog (holdout protocol)
 python ../run_olympus.py --task hplc      # or fullerenes, snar, alkox, ...
-python ../run_idc_21seeds.py              # full SO catalog
+# the full SO catalog sweep (run_idc_21seeds.py) runs from the authors'
+# workspace and is not bundled in this companion
 
 # Multi-objective catalog
 #   moeed13 is the §8.3 example; the other MO entries (lnp3, biochar_ec,

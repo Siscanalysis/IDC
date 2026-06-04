@@ -62,5 +62,6 @@ results/<suite>/<suite>_idc_vs_pymoo.csv   ← run_bbob_suites.py
 results/bbob/bbob_stress.csv               ← run_bbob_stress.py
 ```
 
-Both are gitignored. Aggregate the suite win/tie/loss tallies with
-[`../aggregate_21seeds.py`](../aggregate_21seeds.py).
+Both are gitignored. The suite win/tie/loss tallies are aggregated by
+the authors' workspace tooling (not bundled in this companion; see the
+"Not bundled" note in [`../README.md`](../README.md)).

@@ -30,7 +30,7 @@ namespace fs = std::filesystem;
 #define EXAMPLE_DIR "."
 #endif
 
-int main()
+int main(int argc, char** argv)
 {
     try
     {
@@ -58,7 +58,15 @@ int main()
             network.set_output_variables(vars_out);
         }
 
-        opennn::set_seed(0);
+        // Optimizer seed: --seed N (default 0). Used by run_idc_21seeds.py to
+        // sweep the 21 independent seeds of the §8.4 held-out protocol.
+        int seed = 0;
+        for(int a = 1; a < argc; ++a)
+        {
+            const std::string s = argv[a];
+            if(s == "--seed" && a + 1 < argc) seed = std::stoi(argv[++a]);
+        }
+        opennn::set_seed(seed);
         ResponseOptimization opt(&network);
 
         // mat_1=PCE10, mat_2=P3HT (donors); mat_3=PCBM, mat_4=oIDTBR (acceptors).
@@ -92,6 +100,10 @@ int main()
 
         std::cout << "[OK] best photo-degradation = " << results(0, 4)
                   << "  (" << walltime << " s)  ->  " << result_csv << std::endl;
+        // Machine-readable line consumed by run_idc_21seeds.py.
+        std::cout << "SWEEP seed=" << seed
+                  << " best_f=" << results(0, 4)
+                  << " walltime=" << walltime << std::endl;
         return 0;
     }
     catch(const std::exception& e)

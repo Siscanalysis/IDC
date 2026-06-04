@@ -1,11 +1,16 @@
 # Reproducing the paper
 
-This document gives the exact recipe to reproduce every numeric result
-and figure in §8 of the paper from a clean clone of this repository.
+This document gives the recipe to build and run the §8 worked examples
+and validation sweeps from a clean clone of this repository. The bundled
+tooling covers the three C++ case studies (§8.3–§8.5), the BBOB / Olympus
+validation runners, the `photo_pce10` 21-seed sweep + aggregation, the
+surrogate-quality audit, and the MO figure-regeneration. The broader
+~14-problem SO catalog sweep and the pymoo/pycma baseline comparison are
+part of the authors' workspace and are not shipped here.
 
 For the conceptual overview of IDC, see [architecture.md](architecture.md).
-For the held-out validation protocol used in the §8.4 / §8.5
-real-application case studies, see
+For the memorization/hallucination safeguards used in the §8.4 (top-5%
+holdout) and §8.5 (age-28 restriction) real-application case studies, see
 [holdout_procedure.md](holdout_procedure.md).
 
 ---
@@ -147,29 +152,35 @@ surrogate); the other three are OpenNN C++ executables.
 
 ---
 
-## Step 4 — Run the validation sweeps and the full catalog
+## Step 4 — Run the validation sweeps
 
-The validation block and the broader catalog are driven from
-`benchmarks/`:
+The analytical and Olympus validation are driven from `benchmarks/`:
 
 ```bash
 cd benchmarks
-python bbob/run_bbob_suites.py   # §8.2 analytical validation (default suite)
-python bbob/run_bbob_stress.py   # §7.3 f15–f24 hard-multimodal stress test
-python run_olympus.py            # §8.4 photo_pce10 (Olympus real-data SO)
-python run_idc_21seeds.py        # full catalog, 21 seeds each
-python aggregate_21seeds.py      # per-problem + combined summaries
-python make_figures.py           # figures used in §8
+python bbob/run_bbob_suites.py    # §8.2 analytical validation (default suite)
+python bbob/run_bbob_stress.py    # §7.3 f15–f24 hard-multimodal stress test
+python run_olympus.py             # §8.4 photo_pce10 (Olympus real-data SO)
+python run_idc_21seeds.py         # §8.4 photo_pce10 IDC sweep, 21 seeds
+python aggregate_21seeds.py       # per-problem summary (mean ± std, best, feas%)
+python audit_surrogates.py        # §8.5 surrogate-quality R² audit table
+python make_figures.py            # §8 MO figures from committed CSVs
+python make_convergence_figure.py # §8.4 best-feasible-vs-evaluations figure
 ```
 
-Expected total runtime: on the order of a couple of hours on a recent
-multi-core CPU. Wall-clock is dominated by the pymoo baselines (~20 s per
-seed); IDC itself runs in well under a second per seed, and the three C++
-case-study examples alone finish in seconds.
+Expected runtime: on the order of a couple of hours on a recent multi-core
+CPU. Wall-clock is dominated by the pymoo baselines (~20 s per seed); IDC
+itself runs in well under a second per seed, and the three C++ case-study
+examples alone finish in seconds. (`run_idc_21seeds.py` on `photo_pce10`
+finishes in about a second total — 21 sub-second seeds.)
 
-Per-problem CSVs land in `benchmarks/results/branch_a/<problem>_idc.csv`;
-aggregated summaries land in
-`benchmarks/results/branch_a/all_problems_21seeds.csv`.
+Each runner writes under `benchmarks/results/`; the 21-seed summary lands
+in `benchmarks/results/branch_a/photo_pce10_summary_21seeds.csv` and the
+figures in `benchmarks/figures/`. The broader ~14-problem SO catalog
+comparison and the pymoo/pycma baselines from the authors' development
+workspace are **not** bundled in this companion; the §8 headline numbers
+are reproduced by the C++ worked examples (Step 3), the 21-seed sweep, and
+the validation runners above.
 
 ### Reproducing problems not shown in the paper
 
@@ -196,13 +207,13 @@ For convenience, every step above is wrapped in:
 ./scripts/reproduce_paper.sh
 ```
 
-This runs: (1) build, (2) the two real-application C++ examples
-(photo_pce10 §8.4, concrete_uci_mo §8.5) and the MOEED13 simulator
-example (§8.3), (3) the BBOB analytical validation (§8.2) and the
-f15–f24 stress test (§7.3), (4) the full catalog sweep, (5) the held-out
-validation for the real-application cases, and (6) figure generation. The
-script is idempotent — re-running it skips steps whose outputs already
-exist and are up to date.
+This runs: (1) configure + build (fetching the pinned OpenNN), (2) the
+three C++ case studies (MOEED13 §8.3, photo_pce10 §8.4, concrete_uci_mo
+§8.5), (3) the BBOB analytical validation (§8.2) and the f15–f24 stress
+test (§7.3), and (4) the §8.4 Olympus real-data SO sweep. Re-running is
+safe: the build is incremental and each example overwrites its own
+`result.csv`. The broader multi-seed catalog sweep, the held-out
+cross-table, and figure generation are not part of this script.
 
 ---
 

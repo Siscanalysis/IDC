@@ -108,7 +108,7 @@ if(NOT OPENNN_TAG)
             "OpenNN: no resolution available. Set one of:\n"
             "  -DOPENNN_ROOT=<local-checkout>     (contributors)\n"
             "  -DOPENNN_TAG=<tag>                 (reviewers, specific paper version)\n"
-            "  OPENNN_DEFAULT_TAG in cmake/FindOrFetchOpenNN.cmake (will be set on paper acceptance)")
+            "  OPENNN_DEFAULT_TAG in cmake/FindOrFetchOpenNN.cmake (ships set to v1.0-IDC-paper)")
     endif()
 else()
     set(OPENNN_RESOLUTION_TIER "tag (${OPENNN_TAG})")

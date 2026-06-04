@@ -7,9 +7,12 @@ writes the Pareto front to `result.csv`. Built via the top-level CMake
 (target `concrete_uci_mo`).
 
 This is one of the two **real-application** case studies in the paper
-(the other is photo_pce10, §8.4). Reported under the top-5% held-out
-validation protocol (see
-[`../../docs/holdout_procedure.md`](../../docs/holdout_procedure.md)).
+(the other is photo_pce10, §8.4). Unlike the SO case, it is **not**
+reported under the top-5% held-out protocol: the age-28 slice (425 rows)
+is too small for a further 5% removal, so §8.5 instead uses an
+**age-28 surrogate restriction** (the surrogate is trained only on the
+age-28 mixes) and calibrates against the measured data ceiling
+(see [`../../docs/holdout_procedure.md`](../../docs/holdout_procedure.md)).
 
 ## Problem
 
@@ -77,9 +80,15 @@ UCI Machine Learning Repository: *Concrete Compressive Strength*
 - Attribution + citation: [`../../data/concrete_uci/SOURCE.md`](../../data/concrete_uci/SOURCE.md).
 
 The MO reformulation is purely in the optimization conditions: the
-cement input variable additionally carries a `min` objective condition
-(surrogate fit R² = 0.967, RMSE ≈ 3.0 MPa). Trained model JSON at
-`nn/concrete_uci.json`.
+cement input variable additionally carries a `min` objective condition.
+The shipped surrogate `nn/concrete_uci.json` is the
+**age-28-restricted** strength model used in §8.5 — trained on the 425
+age-28 mixes only (test R² ≈ 0.79, training R² ≈ 0.76, RMSE ≈ 7.2 MPa),
+so it shares the curing age of the optimization target and cannot
+extrapolate strength patterns from older mixes. (For reference, an
+all-ages surrogate over the full 1030 rows fits higher, R² ≈ 0.97, but
+at the cost of cross-age extrapolation; §8.5 deliberately uses the
+age-28 model instead. That all-ages model is not shipped here.)
 Budget: 40,000 surrogate evaluations per seed, 21 independent seeds per
 algorithm; the IDC side additionally caps the empirical Pareto front at
 10,000 points (paper §8.1).

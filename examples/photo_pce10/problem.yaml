@@ -8,7 +8,7 @@ problem:
 
 dataset:
   type: real_csv
-  path: "C:/Users/Artelnics/Desktop/benchmark_datasets/so_realdata/P_olympus_campaigns/olympus_photo_pce10/data/photo_pce10.csv"
+  path: "../../data/photo_pce10/photo_pce10.csv"
   target_column: degradation
   n_samples: 1040
 

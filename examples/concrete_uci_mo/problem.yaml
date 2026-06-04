@@ -13,7 +13,7 @@ problem:
 dataset:
   type: real_data
   source: concrete_uci_training_data
-  surrogate_nn: "C:/Users/Artelnics/Desktop/benchmark_datasets/mo_realdata/C_materials_doe/concrete_uci_mo/nn/concrete_uci_nn.json"
+  surrogate_nn: "nn/concrete_uci.json"
   notes: "Reuses the SO concrete_uci surrogate (1 output: strength). The cement objective is a passthrough on the cement input variable."
 
 inputs:

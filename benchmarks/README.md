@@ -10,10 +10,7 @@ points to but does not show explicitly.
 benchmarks/
 ├── README.md                ← this file
 ├── requirements.txt         ← pip dependencies
-├── run_idc_21seeds.py       ← drives IDC on all catalog problems
 ├── run_olympus.py           ← Olympus real-data runner; --task switch (default photo_pce10)
-├── aggregate_21seeds.py     ← per-problem + combined summaries
-├── make_figures.py          ← regenerates the figures in the paper
 ├── make_convergence_figure.py ← renders the §8.4 photo_pce10 convergence-vs-budget figure
 ├── extra_results/           ← committed result snapshots beyond §8 (see its README)
 ├── bbob/
@@ -25,6 +22,14 @@ benchmarks/
     ├── branch_a/            ← per-problem CSVs from the catalog sweep (gitignored)
     └── olympus/             ← per-task CSVs from run_olympus.py (gitignored)
 ```
+
+> **Scope.** `run_idc_21seeds.py` + `aggregate_21seeds.py` ship here and
+> sweep the single-objective `photo_pce10` example over 21 seeds;
+> `make_figures.py` and `audit_surrogates.py` also ship (figures from the
+> committed result CSVs, and the surrogate-quality R² audit). The broader
+> ~14-problem SO catalog and the pymoo/pycma baseline comparison are run
+> from the authors' workspace (the catalog drivers live in
+> `experiments/IDC_benchmark/`).
 
 ## What maps to which §
 
@@ -86,9 +91,7 @@ pip install -r requirements.txt
 python bbob/run_bbob_suites.py     # §8.2 analytical validation (default suite)
 python bbob/run_bbob_stress.py     # §7.3 f15–f24 stress test
 python run_olympus.py              # §8.4 photo_pce10 real-application SO
-python run_idc_21seeds.py          # full catalog, 21 seeds each
-python aggregate_21seeds.py        # produces all_problems_21seeds.csv
-python make_figures.py             # regenerates the figures in §8
+python make_convergence_figure.py  # §8.4 convergence figure from extra_results/
 ```
 
 Expected runtime on commodity hardware (i7 8-core): on the order of a
@@ -107,16 +110,19 @@ itself runs in well under a second per seed.
 
 ## Status
 
-This is a scaffold. The runner scripts above expose the full switch
-surface and the self-contained pieces (the f15–f24 stress test) run
-today; the COCO-suite and Olympus optimization back-ends are ported from
-the authors' working trees at `experiments/IDC_benchmark/` and
-`experiments/Papers/first_IDC_paper/afte_first_review/experiments/` once
-§8 of the paper is finalized.
+The bundled runners (`run_olympus.py`, `bbob/run_bbob_suites.py`,
+`bbob/run_bbob_stress.py`, `make_convergence_figure.py`), the
+`photo_pce10` 21-seed sweep (`run_idc_21seeds.py` + `aggregate_21seeds.py`),
+the surrogate-quality audit (`audit_surrogates.py`), and the MO
+figure-regeneration (`make_figures.py`) all run today and reproduce the
+results shown explicitly in the paper. The broader ~14-problem SO catalog
+sweep and the pymoo/pycma baseline comparison are maintained in the
+authors' working tree (`experiments/IDC_benchmark/`); OpenNN is pinned to
+the immutable tag `v1.0-IDC-paper` for byte-reproducibility.
 
 ## Per-problem CSV schema
 
-Every `branch_a/<problem>_idc.csv` produced by `run_idc_21seeds.py`
+Every `branch_a/<problem>_idc.csv` produced by the full-catalog sweep
 follows the schema:
 
 | Column          | Type    | Description |
@@ -130,5 +136,6 @@ follows the schema:
 | `n_iters`       | int     | IDC iterations (1 for non-IDC baselines) |
 | extra per-problem columns | float   | input coordinates of the best point, where relevant |
 
-The aggregator (`aggregate_21seeds.py`) consumes these and produces the
-cross-problem summary in `all_problems_21seeds.csv`.
+The aggregator consumes these and produces the cross-problem summary in
+`all_problems_21seeds.csv` (both run from the authors' workspace; see the
+"Not bundled" note above).

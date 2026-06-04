@@ -9,8 +9,13 @@ suite, the held-out validation protocol, and a reproduction recipe — all
 built on top of the open-source library
 [OpenNN](https://github.com/Artelnics/opennn).
 
-> **Status.** Scaffold. Worked-example implementations land once the paper
-> is accepted; the OpenNN tag pinned for byte-reproducibility is set then.
+> **Status.** The C++ worked examples (§8.3–§8.5), the BBOB / Olympus
+> validation runners, the `photo_pce10` 21-seed sweep + aggregation, the
+> surrogate-quality audit, the MO figure-regeneration, and the in-tree
+> datasets are present and runnable. OpenNN is pinned to the immutable tag
+> `v1.0-IDC-paper` for byte-reproducibility. The broader ~14-problem SO
+> catalog sweep and the pymoo/pycma baseline comparison are run from the
+> authors' workspace.
 
 ---
 
@@ -48,15 +53,20 @@ number in the §8.4 table of the paper.
 ## Reproducing the paper
 
 ```bash
-./scripts/reproduce_paper.sh   # runs all §8 examples end-to-end
+./scripts/reproduce_paper.sh   # build + the three C++ case studies + BBOB + Olympus
 ```
 
-Expected runtime on commodity hardware (i7 8-core, no GPU): the three C++
-case-study examples finish in seconds; the full end-to-end sweep (catalog
-+ holdout) is on the order of a couple of hours, dominated by the pymoo
-baselines (IDC itself is sub-second per seed).
-The script regenerates every results CSV, every plot, and the holdout
-validation cross-table.
+This configures and builds (fetching the pinned OpenNN), runs the three
+C++ case studies (§8.3 MOEED13, §8.4 photo_pce10, §8.5 concrete_uci_mo),
+then runs the §8.2 BBOB validation, the §7.3 f15–f24 stress test, and the
+§8.4 Olympus real-data SO sweep. The three C++ examples finish in
+seconds; the BBOB / Olympus runners take longer, dominated by the pymoo
+baselines (IDC itself is sub-second per seed). It then runs the
+photo_pce10 21-seed sweep + aggregation, renders the surrogate-quality
+audit, and regenerates the §8 MO figures from the committed result CSVs.
+The broader ~14-problem SO catalog sweep, the pymoo/pycma baseline
+comparison, and the holdout cross-table are run from the authors'
+workspace and are not bundled in this companion.
 
 ---
 
@@ -85,18 +95,18 @@ the manuscript.
 
 ## Benchmark suite
 
-`benchmarks/` contains the 21-seed sweep and the catalog runners used in
-the paper:
+`benchmarks/` contains the validation and catalog runners used in the
+paper:
 
-- `run_idc_21seeds.py` — drives IDC on all catalog problems
 - `run_olympus.py` — Olympus real-data runner; `--task` selects the task
   (default `photo_pce10`; other tasks are *not* shown in the paper)
 - `bbob/run_bbob_suites.py` — COCO suite driver; `--suite` selects the
   suite (default `bbob-biobj-mixint`, the only one shown explicitly)
 - `bbob/run_bbob_stress.py` — the f15–f24 hard-multimodal stress test
-  (§7.3 limitations) at *n*=5 and *n*=20
-- `aggregate_21seeds.py` — per-problem and combined summaries
-- `make_figures.py` — regenerates the figures in the paper
+  (§7.3 limitations)
+- `make_convergence_figure.py` — regenerates the §8.4 convergence figure
+  from the committed `extra_results/` CSVs
+- `requirements.txt` — Python dependencies for the runners
 
 See [`benchmarks/README.md`](benchmarks/README.md) for the switch
 reference and details.

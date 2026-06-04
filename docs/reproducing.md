@@ -5,8 +5,9 @@ and validation sweeps from a clean clone of this repository. The bundled
 tooling covers the three C++ case studies (§8.3–§8.5), the BBOB / Olympus
 validation runners, the `photo_pce10` 21-seed sweep + aggregation, the
 surrogate-quality audit, and the MO figure-regeneration. The broader
-~14-problem SO catalog sweep and the pymoo/pycma baseline comparison are
-part of the authors' workspace and are not shipped here.
+~30-problem benchmark catalog the paper's §8.1 points to and the
+pymoo/pycma baseline comparison are part of the authors' workspace and
+are not shipped here.
 
 For the conceptual overview of IDC, see [architecture.md](architecture.md).
 For the memorization/hallucination safeguards used in the §8.4 (top-5%
@@ -176,9 +177,10 @@ finishes in about a second total — 21 sub-second seeds.)
 
 Each runner writes under `benchmarks/results/`; the 21-seed summary lands
 in `benchmarks/results/branch_a/photo_pce10_summary_21seeds.csv` and the
-figures in `benchmarks/figures/`. The broader ~14-problem SO catalog
-comparison and the pymoo/pycma baselines from the authors' development
-workspace are **not** bundled in this companion; the §8 headline numbers
+figures in `benchmarks/figures/`. The broader ~30-problem benchmark
+catalog (the §8.1 catalog) and the pymoo/pycma baselines from the
+authors' development workspace are **not** bundled in this companion;
+the §8 headline numbers
 are reproduced by the C++ worked examples (Step 3), the 21-seed sweep, and
 the validation runners above.
 

@@ -27,9 +27,9 @@ benchmarks/
 > sweep the single-objective `photo_pce10` example over 21 seeds;
 > `make_figures.py` and `audit_surrogates.py` also ship (figures from the
 > committed result CSVs, and the surrogate-quality R² audit). The broader
-> ~14-problem SO catalog and the pymoo/pycma baseline comparison are run
-> from the authors' workspace (the catalog drivers live in
-> `experiments/IDC_benchmark/`).
+> ~30-problem benchmark catalog (the §8.1 catalog) and the pymoo/pycma
+> baseline comparison are run from the authors' workspace (the catalog
+> drivers live in `experiments/IDC_benchmark/`).
 
 ## What maps to which §
 
@@ -115,10 +115,11 @@ The bundled runners (`run_olympus.py`, `bbob/run_bbob_suites.py`,
 `photo_pce10` 21-seed sweep (`run_idc_21seeds.py` + `aggregate_21seeds.py`),
 the surrogate-quality audit (`audit_surrogates.py`), and the MO
 figure-regeneration (`make_figures.py`) all run today and reproduce the
-results shown explicitly in the paper. The broader ~14-problem SO catalog
-sweep and the pymoo/pycma baseline comparison are maintained in the
-authors' working tree (`experiments/IDC_benchmark/`); OpenNN is pinned to
-the immutable tag `v1.0-IDC-paper` for byte-reproducibility.
+results shown explicitly in the paper. The broader ~30-problem benchmark
+catalog (the §8.1 catalog) and the pymoo/pycma baseline comparison are
+maintained in the authors' working tree (`experiments/IDC_benchmark/`);
+OpenNN is pinned to the immutable tag `v1.0-IDC-paper` for
+byte-reproducibility.
 
 ## Per-problem CSV schema
 

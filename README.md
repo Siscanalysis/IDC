@@ -13,9 +13,9 @@ built on top of the open-source library
 > validation runners, the `photo_pce10` 21-seed sweep + aggregation, the
 > surrogate-quality audit, the MO figure-regeneration, and the in-tree
 > datasets are present and runnable. OpenNN is pinned to the immutable tag
-> `v1.0-IDC-paper` for byte-reproducibility. The broader ~14-problem SO
-> catalog sweep and the pymoo/pycma baseline comparison are run from the
-> authors' workspace.
+> `v1.0-IDC-paper` for byte-reproducibility. The broader ~30-problem
+> benchmark catalog the paper's §8.1 points to and the pymoo/pycma
+> baseline comparison are run from the authors' workspace.
 
 ---
 
@@ -64,9 +64,9 @@ seconds; the BBOB / Olympus runners take longer, dominated by the pymoo
 baselines (IDC itself is sub-second per seed). It then runs the
 photo_pce10 21-seed sweep + aggregation, renders the surrogate-quality
 audit, and regenerates the §8 MO figures from the committed result CSVs.
-The broader ~14-problem SO catalog sweep, the pymoo/pycma baseline
-comparison, and the holdout cross-table are run from the authors'
-workspace and are not bundled in this companion.
+The broader ~30-problem benchmark catalog (the §8.1 catalog), the
+pymoo/pycma baseline comparison, and the holdout cross-table are run
+from the authors' workspace and are not bundled in this companion.
 
 ---
 

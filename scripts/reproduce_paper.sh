@@ -10,9 +10,10 @@
 #   7. regenerate the §8 MO figures from the committed result CSVs
 #
 # Re-running is safe: the build is incremental and each example overwrites its
-# own result.csv. The broader SO catalog (the ~14 problems §8.1 points to) and
-# the pymoo/pycma baseline comparison are run from the authors' workspace; the
-# 21-seed sweep here covers the shipped photo_pce10 SO example.
+# own result.csv. The broader ~30-problem benchmark catalog (the additional
+# problems §8.1 points to) and the pymoo/pycma baseline comparison are run from
+# the authors' workspace; the 21-seed sweep here covers the shipped photo_pce10
+# SO example.
 
 set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"

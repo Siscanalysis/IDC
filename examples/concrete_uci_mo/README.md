@@ -1,10 +1,30 @@
 # §8.5 — Real-application case study (MO): UCI Concrete (max strength, min cement)
 
 **Buildable C++ example.** `main.cpp` loads the trained strength
-surrogate (`nn/concrete_uci.json`), applies the six affine constraints in
+surrogate (`nn/concrete_uci.json`), applies the affine constraints in
 `problem.yaml`, runs multi-objective IDC (max strength, min cement), and
 writes the Pareto front to `result.csv`. Built via the top-level CMake
 (target `concrete_uci_mo`).
+
+**Two mass-balance formulations** are shipped (see §8.5):
+
+| run | mass balance | files |
+|-----|--------------|-------|
+| `./bin/concrete_uci_mo` (default) | **equality** $\sum$ ingredients $= \mu$ | `problem.yaml`, `result.csv` |
+| `./bin/concrete_uci_mo band`      | **tolerance band** $\mu \pm 0.5$ | `band/problem.yaml`, `band/result.csv` |
+
+with $\mu = 2325.012558$ kg/m³ = the mean ingredient sum over the 425 age-28
+rows. **The equality here is a modeling choice** ("fix the recipe to the mean
+dataset density" — i.e. search the mix *proportions* independent of the absolute
+batch quantity), *not* a physical law — concrete density is genuinely a
+tolerance — in contrast to MOEED13's power-balance demand equality. The
+equality is still the instructive, physically meaningful headline: its feasible
+set is a measure-zero hyperplane the population baselines cannot sample (they
+collapse to a point) while IDC's affine repair projects onto it exactly. Because
+that is unwinnable for a population method, the paper relaxes the constraint to
+the band *for the baselines only* and scores residuals against $\mu$; IDC stays
+on the equality. All runs use the **same 400,000 total surrogate-evaluation
+budget** with a `10×` initial-sampling pass.
 
 This is one of the two **real-application** case studies in the paper
 (the other is photo_pce10, §8.4). Unlike the SO case, it is **not**
@@ -52,7 +72,7 @@ satisfy the constraint (audited 2026-06-02):
 
 | Name | Constraint | Source / rationale | Data pass |
 |------|-----------|--------------------|-----------|
-| `mass_balance` | Σ ingredients ∈ [2200, 2600] | density ~ 2400 kg/m³ (physical identity) | 99.7% |
+| `mass_balance` | Σ ingredients $= \mu$ (band: $\mu\pm0.5$) | mean age-28 density $\mu=2325.01$ kg/m³; modeling choice, not a physical law | n/a (equality) |
 | `binder_floor` | cement + slag + fly_ash ≥ 200 | BS EN 206 / BS 8500 | 100% |
 | `slag_replacement` | slag ≤ 0.70 · binder | ASTM C595 Type IS | 100% |
 | `water_cement_lower` | water ≥ 0.30 · cement | hydration minimum | 98.6% |
@@ -89,9 +109,12 @@ extrapolate strength patterns from older mixes. (For reference, an
 all-ages surrogate over the full 1030 rows fits higher, R² ≈ 0.97, but
 at the cost of cross-age extrapolation; §8.5 deliberately uses the
 age-28 model instead. That all-ages model is not shipped here.)
-Budget: 40,000 surrogate evaluations per seed, 21 independent seeds per
-algorithm; the IDC side additionally caps the empirical Pareto front at
-10,000 points (paper §8.1).
+Budget: the §8.5 matched-budget MO study holds IDC and the NSGA-II/III
+baselines to the **same 400,000 total surrogate-evaluation budget** (IDC via
+`set_max_total_evaluations(400000)` with per-point sampling $N=200$; on this
+problem IDC converges before the cap, at $\approx 377{,}000$ evaluations). The
+IDC side additionally caps the empirical Pareto front at 10,000 points. This
+deterministic worked example uses a single seed (`set_seed(0)`).
 
 ## Expected output
 
@@ -102,26 +125,28 @@ To reproduce:
 ```bash
 cd build
 cmake --build . --target concrete_uci_mo
-./bin/concrete_uci_mo
+./bin/concrete_uci_mo        # equality (headline)  -> result.csv
+./bin/concrete_uci_mo band   # tolerance band       -> band/result.csv
+# matched-budget NSGA-II/III baselines + figures + summary table:
+python ../benchmarks/baselines/run_baselines.py --example concrete_uci_mo --seed 42 --budget 400000
+python ../benchmarks/baselines/run_baselines.py --example concrete_uci_mo --seed 42 --budget 400000 --subdir band
+python ../benchmarks/mo_matched_budget.py
 ```
 
 The Pareto front plot is reported in the §8.5 Pareto-front figure of the
 paper; the internal-gap and boundary-gap stability metrics in the §8.5
-results table.
+results table; the normalized-HV / residual numbers in `tab:case_concrete_mo`.
 
-**Reproducibility scope.** This example runs the **IDC** side only (the
-default §8.1 config: $N=2000$, $I_{\max}=20$, seed $0$, Pareto cap
-$10\,000$, hardcoded in `main.cpp`). On the pinned OpenNN tag it returns
-the §8.5 IDC front to within run-to-run / build variation
-($\approx 5{,}500$ points, strength maximum $\approx 77.6$ MPa); the
-committed `expected_output.csv` is the smoke-test reference for that run.
-The full IDC-vs-NSGA-II/III comparison, the per-algorithm
-constraint-violation figures, and the §8.5 normalized-hypervolume and
-3-front overlay plots are produced from the authors' workspace (the
-pymoo baselines are not bundled here, as noted in the top-level README).
-To make the paper and this example byte-identical, regenerate
-`expected_output.csv` with `./bin/concrete_uci_mo` on the pinned tag and
-report that run's exact $|\mathcal{P}|$ and strength maximum in §8.5.
+**Reproducibility scope.** The matched-budget config ($N=200$,
+`set_max_total_evaluations(400000)`, `set_initial_sampling_factor(10)`,
+$I_{\max}=20$, seed $0$, Pareto cap $10\,000$) is hardcoded in `main.cpp`. On the
+pinned OpenNN tag the equality run returns a deterministic **607-point** front
+(strength maximum $\approx 67$ MPa) and the band run a **608-point** front; the
+committed `expected_output.csv` is the smoke-test reference for the equality run.
+The
+NSGA-II/III baselines are bundled (`pymoo_fronts.csv`, `band/pymoo_fronts.csv`)
+and the normalized-HV figures + summary table regenerate from a clean clone via
+`benchmarks/mo_matched_budget.py`.
 
 ## Why this is interesting
 

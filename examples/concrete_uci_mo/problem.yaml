@@ -4,6 +4,13 @@
 # coarse_agg, fine_agg, age — short forms). The SO surrogate is reused;
 # the cement minimization objective is a passthrough on the cement input
 # variable.
+#
+# Mass balance (this file): EQUALITY sum(ingredients) == mu, mu = 2325.012558
+# kg/m^3 = the mean ingredient sum over the 425 age-28 dataset rows. Unlike
+# MOEED13's power balance (a physical demand equality), the concrete density
+# equality is a MODELING CHOICE — "fix the mix to the mean dataset density" —
+# the real engineering constraint is a tolerance band (~2200-2600 kg/m^3).
+# The tolerance-band variant mu +/- 0.5 lives in band/problem.yaml. See §8.5.
 
 problem:
   name: concrete_uci_mo
@@ -45,9 +52,9 @@ constraints:
   - name: mass_balance
     type: linear_inequality
     coefficients: { cement: 1, slag: 1, fly_ash: 1, water: 1, sp: 1, coarse_agg: 1, fine_agg: 1 }
-    lower: 2200.0
-    upper: 2600.0
-    notes: "Total mix density ~ 2400 kg/m^3 (engineering tolerance [2200, 2600])."
+    lower: 2325.012558
+    upper: 2325.012558
+    notes: "EQUALITY study: sum(ingredients) == mean age-28 dataset density (2325.0126 kg/m^3, 425 rows). lower==upper -> EqualTo."
   # ---- 2026-06-01 revision: general-purpose institutional constraints ----
   # Replaces the earlier strength-focused ACI 233R / FHWA bounds with general-
   # purpose limits from EN 206 + ASTM C595, which do not assume a specific
@@ -100,9 +107,9 @@ formula_constraints:
     expr: "cement + slag + fly_ash + water + sp + coarse_agg + fine_agg"
     shape: affine
     scope: inputs
-    relation: "in"
-    value: [2200.0, 2600.0]
-    tolerance: 0
+    relation: "=="
+    value: 2325.012558   # EQUALITY (see constraints: block); mirrors it for the
+    tolerance: 0         # legacy formula schema. Band variant: band/problem.yaml.
     required: true
   # ---- 2026-06-01 revision: EN 206 + ASTM C595 general-purpose set ----
   - name: binder_min_en206
@@ -133,12 +140,17 @@ formula_constraints:
   # near-record values, and pymoo's extrapolation peak naturally disappears.
 
 budget:
-  # §8.1 default IDC configuration (what main.cpp hardcodes for this example).
-  total_nn_evaluations: 40000   # = idc_per_iteration * idc_max_iterations
-  idc_per_iteration: 2000       # N  (main.cpp: set_evaluations_number(2000))
-  idc_max_iterations: 20        # I_max (main.cpp: set_iterations(20))
-  idc_max_pareto: 10000         # empirical-front cap (main.cpp: set_max_pareto_number)
+  # Matched-budget multi-objective study (Section 8.5): IDC and the NSGA-II/III
+  # baselines are held to the SAME 400000 total surrogate-evaluation budget.
+  # IDC uses per-point sampling 200 with the total hard-capped via
+  # set_max_total_evaluations(400000); it converges before the cap here (~377k
+  # evals). The baselines run a 100-individual population to 400000 evaluations.
+  total_nn_evaluations: 400000          # matched cap (set_max_total_evaluations)
+  idc_per_iteration: 200                # N  (main.cpp: set_evaluations_number(200))
+  idc_max_total_evaluations: 400000     # main.cpp: set_max_total_evaluations(400000)
+  idc_max_iterations: 20                # I_max (main.cpp: set_iterations(20))
+  idc_max_pareto: 10000                 # empirical-front cap (main.cpp: set_max_pareto_number)
 
 seeds:
-  count: 21
-  base: 42
+  count: 1
+  base: 0   # deterministic single-seed worked example (opennn::set_seed(0))

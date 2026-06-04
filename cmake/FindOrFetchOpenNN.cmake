@@ -28,15 +28,22 @@
 # The examples build against the refactored OpenNN API (JSON model format and
 # the ResponseOptimization class used throughout §8), which currently lives on
 # the `dev-refactor` branch of Artelnics/opennn. That work is published as the
-# immutable annotated tag `v1.0-IDC-paper` (commit 26cd4634a) -- the paper
+# immutable annotated tag `v1.2-IDC-paper` (commit 64889b5e4) -- the paper
 # version of record -- so a clean clone is byte-reproducible and does not drift
-# as `dev-refactor` advances. The published tags v6.0.x predate the refactor and
-# will NOT compile these examples.
+# as `dev-refactor` advances. v1.2-IDC-paper carries the matched-budget
+# multi-objective machinery used in §8.3 (MOEED13) and §8.5 (UCI Concrete): the
+# total surrogate-evaluation cap (set_max_total_evaluations), the reworked
+# affine-repair input swap (uniform-in-band projection; exact on equalities),
+# and the configurable initial-sampling factor (set_initial_sampling_factor).
+# It supersedes v1.1-IDC-paper and v1.0-IDC-paper (commit 26cd4634a); all the
+# new knobs default to their no-op values, so the base API is unchanged. The
+# published tags v6.0.x predate the refactor and will NOT compile these examples.
 #
-set(OPENNN_DEFAULT_TAG "v1.0-IDC-paper" CACHE STRING
+set(OPENNN_DEFAULT_TAG "v1.2-IDC-paper" CACHE STRING
     "Default OpenNN ref for reproduction. Pinned to the immutable tag \
-     v1.0-IDC-paper (commit 26cd4634a) on Artelnics/opennn -- the §8 \
-     ResponseOptimization API, the paper version of record.")
+     v1.2-IDC-paper (commit 64889b5e4) on Artelnics/opennn -- the §8 \
+     ResponseOptimization API plus the matched-budget evaluation cap, \
+     the paper version of record.")
 
 # -----------------------------------------------------------------------------
 # Eigen (required by OpenNN)
@@ -108,7 +115,7 @@ if(NOT OPENNN_TAG)
             "OpenNN: no resolution available. Set one of:\n"
             "  -DOPENNN_ROOT=<local-checkout>     (contributors)\n"
             "  -DOPENNN_TAG=<tag>                 (reviewers, specific paper version)\n"
-            "  OPENNN_DEFAULT_TAG in cmake/FindOrFetchOpenNN.cmake (ships set to v1.0-IDC-paper)")
+            "  OPENNN_DEFAULT_TAG in cmake/FindOrFetchOpenNN.cmake (ships set to v1.2-IDC-paper)")
     endif()
 else()
     set(OPENNN_RESOLUTION_TIER "tag (${OPENNN_TAG})")

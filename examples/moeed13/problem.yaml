@@ -4,7 +4,8 @@
 #
 # Cost: identical to ELD-13 (a + b*P + c*P^2 + |e*sin(f*(P_min - P))| per unit)
 # Emission: per-type quadratic E_i = α_i + β_i*P_i + γ_i*P_i^2 (lb/h NOx)
-# Demand: 1800 ± 0.5 MW (same power-balance band)
+# Demand: sum(P_i) == 1800 MW (power-balance EQUALITY; the band variant 1800
+#         ± 0.5 MW lives in band/problem.yaml). See Section 8.3.
 #
 # Note: The 13-unit MOEED is less standardized than 6-unit Abido (2003).
 # Emission coefficients here follow the "type-based" parameterization common
@@ -56,8 +57,10 @@ constraints:
       P_10: 1
       P_11: 1
       P_12: 1
-    lower: 1799.5
-    upper: 1800.5
+    lower: 1800.0
+    upper: 1800.0   # power balance is an equality: sum(P_i) == D_total = 1800 MW
+                    # (lower==upper -> EqualTo; IDC's affine repair projects onto
+                    #  the demand hyperplane exactly, instead of a band edge)
 
 objectives:
   - { variable: total_cost,     direction: minimize }
@@ -70,11 +73,19 @@ known_pareto_front:
   type: empirical_reference
   source: "Built by running NSGA-II directly on the analytical cost+emission with a high budget; the resulting non-dominated set is used as the reference Pareto set for IDC and surrogate-based runs."
 
+# Matched-budget multi-objective study (Section 8.3): IDC and the NSGA-II/III
+# baselines are held to the SAME total surrogate-evaluation budget of 400000.
+# IDC uses per-point sampling 200 with the total hard-capped via
+# set_max_total_evaluations(400000); the baselines run a 100-individual
+# population to 400000 function evaluations. (The earlier nominal 40000-budget
+# numbers undercounted IDC, whose MO loop samples per Pareto point per
+# iteration; the cap makes the budgets directly comparable.)
 budget:
-  total_nn_evaluations: 40000
-  idc_per_iteration: 2000
+  total_nn_evaluations: 400000
+  idc_per_iteration: 200
+  idc_max_total_evaluations: 400000
   idc_max_iterations: 20
 
 seeds:
-  count: 11
-  base: 42
+  count: 1
+  base: 0   # deterministic single-seed worked example (opennn::set_seed(0))

@@ -1,0 +1,85 @@
+# concrete_uci_mo — BAND formulation of the MO UCI Concrete reformulation.
+#
+# Identical to ../problem.yaml except the mass-balance constraint is a tight
+# tolerance BAND, sum(ingredients) in [2324.512558, 2325.512558] kg/m^3
+# (mu +/- 0.5, mu = 2325.012558 = mean age-28 dataset density), instead of the
+# equality sum(ingredients) == mu. The band has positive measure, so the
+# population baselines (NSGA-II/III) can sample it and it is the honest
+# matched-budget contest; under the equality (../problem.yaml) the feasible set
+# is a measure-zero hyperplane the population baselines cannot sample, so they
+# collapse to a single point while IDC's affine repair projects onto it exactly.
+# Note: the concrete density constraint is genuinely a tolerance in practice;
+# the equality is a fixed-to-mean-density modeling choice, not a physical law
+# (contrast MOEED13's power-balance demand equality). See Section 8.5.
+
+problem:
+  name: concrete_uci_mo
+  type: multi_objective
+  source: "UCI Concrete Compressive Strength (Yeh 1998), reformulated as bi-objective: max strength vs min cement."
+
+dataset:
+  type: real_data
+  source: concrete_uci_training_data
+  surrogate_nn: "nn/concrete_uci.json"
+  notes: "Reuses the SO concrete_uci surrogate (1 output: strength). The cement objective is a passthrough on the cement input variable."
+
+inputs:
+  - { name: cement,     bounds: [102.0, 540.0], units: kg/m^3 }
+  - { name: slag,       bounds: [0.0, 360.0],   units: kg/m^3 }
+  - { name: fly_ash,    bounds: [0.0, 200.0],   units: kg/m^3 }
+  - { name: water,      bounds: [122.0, 247.0], units: kg/m^3 }
+  - { name: sp,         bounds: [0.0, 32.0],    units: kg/m^3 }
+  - { name: coarse_agg, bounds: [801.0, 1145.0], units: kg/m^3 }
+  - { name: fine_agg,   bounds: [594.0, 992.0], units: kg/m^3 }
+  - { name: age,        bounds: [28.0, 28.0],   units: days, notes: "Fixed at 28 days per standard strength protocol." }
+
+objectives:
+  - { variable: strength, direction: maximize, source: nn_output }
+  - { variable: cement,   direction: minimize, source: passthrough_input,
+      notes: "Second objective is the cement input itself; no NN call required." }
+
+constraints:
+  - name: water_cement_ratio_lower
+    type: linear_inequality
+    coefficients: { water: 1, cement: -0.30 }
+    lower: 0.0
+    notes: "water - 0.30 * cement >= 0  (practical mix: w/c >= 0.30)"
+  - name: water_cement_ratio_upper
+    type: linear_inequality
+    coefficients: { water: 1, cement: -0.70 }
+    upper: 0.0
+    notes: "water - 0.70 * cement <= 0  (practical mix: w/c <= 0.70)"
+  - name: mass_balance
+    type: linear_inequality
+    coefficients: { cement: 1, slag: 1, fly_ash: 1, water: 1, sp: 1, coarse_agg: 1, fine_agg: 1 }
+    lower: 2324.512558
+    upper: 2325.512558
+    notes: "BAND study: sum(ingredients) in mu +/- 0.5 (mu = 2325.012558 kg/m^3, mean age-28 density, 425 rows). Between."
+  - name: binder_min_en206
+    type: linear_inequality
+    coefficients: { cement: 1, slag: 1, fly_ash: 1 }
+    lower: 200.0
+    notes: "Total binder >= 200 kg/m^3. BS EN 206 / BS 8500 minimum cement-or-combination content for X0/no-risk class — generic floor that applies to any structural concrete."
+  - name: slag_replacement_max_astm_c595
+    type: linear_inequality
+    coefficients: { slag: 0.30, cement: -0.70, fly_ash: -0.70 }
+    upper: 0.0
+    notes: "slag <= 0.70 * (cement + slag + fly_ash). ASTM C595 Type IS (Portland blast-furnace slag cement, general construction) — accepts up to 70% slag content in the blended cement."
+  - name: fly_ash_replacement_max_astm_c595
+    type: linear_inequality
+    coefficients: { fly_ash: 0.60, cement: -0.40, slag: -0.40 }
+    upper: 0.0
+    notes: "fly_ash <= 0.40 * (cement + slag + fly_ash). ASTM C595 Type IP (Portland-pozzolan cement, general construction) modern revision — caps pozzolan replacement at 40%."
+
+# Matched-budget multi-objective study (Section 8.5): same 400000 total
+# surrogate-evaluation budget as the equality formulation and the baselines.
+budget:
+  total_nn_evaluations: 400000
+  idc_per_iteration: 200
+  idc_max_total_evaluations: 400000
+  idc_max_iterations: 20
+  idc_max_pareto: 10000
+
+seeds:
+  count: 1
+  base: 0   # deterministic single-seed worked example (opennn::set_seed(0))

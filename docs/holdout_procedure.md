@@ -143,14 +143,16 @@ strength rather than just luck: IDC's recommended points are close in
 input space to the actual held-out best, not just in surrogate-output
 space.
 
-> **Note on the broader catalog.** The committed single-objective
-> cross-table in [`../benchmarks/extra_results/`](../benchmarks/extra_results/)
-> was produced with an earlier **four-metric** variant of this protocol
-> (`absolute_gap`, `relative_gap`, `absolute_geo`, `relative_geo` —
-> absolute/relative value gaps plus input-space distance to the nearest
-> held-out point). It captures the same value-vs-space distinction; the
-> paper's two-metric `value_gap` / `space_gap` pair is the consolidated
-> form used for the headline §8.4 / §8.5 case studies.
+> **Reproducing the §8.4 diagnostics.** The two-metric `value_gap` /
+> `space_gap` pair above is reproduced from a clean clone by the held-out
+> pipeline in [`../benchmarks/holdout/`](../benchmarks/holdout/):
+> `gen_holdout_splits.py` (top-5% splits) → `train_surrogate` (OpenNN
+> Growing Neurons on each split, exporting `.json` + numpy `.py`) → IDC
+> (`./bin/photo_pce10 --nn ...`) and the pymoo/pycma baselines
+> (`../benchmarks/baselines/run_baselines.py --nn-py ...`) →
+> `compute_holdout_gaps.py`. The broader single-objective catalog held-out
+> sweep (15 problems) is maintained in the authors' workspace and is not
+> bundled here.
 
 ---
 

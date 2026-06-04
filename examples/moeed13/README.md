@@ -2,9 +2,30 @@
 
 **Buildable C++ example.** `main.cpp` loads the 2-output simulator
 surrogate (`nn/moeed13.json`), applies the per-unit bounds and the
-power-balance equality in `problem.yaml`, runs multi-objective IDC
-(min cost, min emission), and writes the Pareto front to `result.csv`.
-Built via the top-level CMake (target `moeed13`).
+power-balance constraint, runs multi-objective IDC (min cost, min
+emission), and writes the Pareto front to `result.csv`. Built via the
+top-level CMake (target `moeed13`).
+
+**Two constraint formulations** are shipped (see §8.3):
+
+| run | constraint | files |
+|-----|-----------|-------|
+| `./bin/moeed13` (default) | **equality** $\sum_i P_i = 1800$ MW | `problem.yaml`, `result.csv` |
+| `./bin/moeed13 band`      | **tolerance band** $1800 \pm 0.5$ MW | `band/problem.yaml`, `band/result.csv` |
+
+The surrogate (`nn/`) is shared. The **equality** is the physical demand
+constraint and the headline result: its feasible set is a measure-zero
+hyperplane that population baselines (NSGA-II/III) cannot sample, so they
+collapse to a single point, while IDC's affine repair projects onto it exactly
+(mean residual $\sim10^{-4}$ MW). Because the equality is unwinnable for a
+population method, the paper's comparison relaxes it to the **band** *for the
+baselines only* — a positive-measure region they can populate — while IDC stays
+on the equality, and scores every residual against the same $1800$ MW target;
+even then the baselines sit $\approx 0.45$ MW off it. The IDC `band` run is also
+shipped (the reworked affine repair now spreads points *inside* the band rather
+than at an edge). All runs use the **same 400,000 total surrogate-evaluation
+budget** (`set_max_total_evaluations(400000)`), with a `10×` initial-sampling
+pass (`set_initial_sampling_factor(10)`).
 
 This is the **validation** counterpart to the analytical
 `bbob-biobj-mixint` sweep ([`../../benchmarks/bbob/`](../../benchmarks/bbob/)).
@@ -37,12 +58,13 @@ bounds — see [`constraints.yaml`](constraints.yaml).
 
 Defined in [`constraints.yaml`](constraints.yaml):
 
-- **Power balance** (required): $\bigl|\sum_i P_i - D_{\text{total}}\bigr|
-  \le 0.5$ MW with $D_{\text{total}} = 1800$ MW (paper
-  Eq. eq:moeed13_problem), encoded as the interval
-  $\sum_i P_i \in [1799.5, 1800.5]$. The training table is box-sampled
-  and does **not** satisfy this equality; it is enforced at optimization
-  time by IDC's affine repair (pymoo uses a penalty).
+- **Power balance** (required): the physical demand constraint
+  $\sum_i P_i = D_{\text{total}}$ with $D_{\text{total}} = 1800$ MW (paper
+  Eq. eq:moeed13_problem). The headline `problem.yaml` encodes it as an
+  **equality** ($\sum_i P_i \in [1800, 1800] \to$ `EqualTo`); the band variant
+  `band/problem.yaml` relaxes it to $\sum_i P_i \in [1799.5, 1800.5]$. The
+  training table is box-sampled and does **not** satisfy the equality; it is
+  enforced at optimization time by IDC's affine repair (pymoo uses a penalty).
 - **Per-unit box bounds** $[P_{\min,i}, P_{\max,i}]$ from Walters–Sheblé
   1993 Table I (e.g. `P_0 ∈ [0, 680]`, `P_3 ∈ [60, 180]`,
   `P_9 ∈ [40, 120]` MW).
@@ -60,8 +82,14 @@ cost/emission simulator, and a 2-output OpenNN feed-forward network is
 fitted by the Growing Neurons selector. Reported surrogate fit:
 $R^2 = 0.9934$ (cost, RMSE ≈ 179 \$/h), $R^2 = 0.9997$ (emission,
 RMSE ≈ 14 lb/h). Trained model JSON at `nn/moeed13.json`.
-Budget: 40,000 surrogate evaluations per seed, 21 independent seeds per
-algorithm (paper §8.1).
+Budget: the §8.3 matched-budget MO study holds IDC and the NSGA-II/III
+baselines to the **same 400,000 total surrogate-evaluation budget**. IDC uses
+per-point sampling $N=200$ with the total hard-capped by
+`set_max_total_evaluations(400000)` (so its per-Pareto-point sampling no longer
+silently outspends the baselines); the baselines run a 100-individual
+population to 400,000 evaluations. This deterministic worked example uses a
+single seed (`set_seed(0)`); the paper's per-seed dispersion is reported from
+the authors' multi-seed sweep.
 
 A small illustrative sample of the simulator output ships at
 [`../../data/moeed13/moeed13_sample.csv`](../../data/moeed13/moeed13_sample.csv)
@@ -95,5 +123,10 @@ To reproduce:
 ```bash
 cd build
 cmake --build . --target moeed13
-./bin/moeed13
+./bin/moeed13          # equality (headline)  -> result.csv
+./bin/moeed13 band     # tolerance band       -> band/result.csv
+# matched-budget NSGA-II/III baselines + figures + summary table:
+python ../benchmarks/baselines/run_baselines.py --example moeed13 --seed 42 --budget 400000
+python ../benchmarks/baselines/run_baselines.py --example moeed13 --seed 42 --budget 400000 --subdir band
+python ../benchmarks/mo_matched_budget.py
 ```

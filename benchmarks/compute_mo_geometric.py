@@ -15,9 +15,11 @@ the normalized-HV convention. It then reports:
                        df,dl = distance of the front extremes to the ideal
                        corners (0,1) and (1,0) of the normalized box.
 
-Validation: on the committed Concrete fronts this reproduces the reported
-Table values to rounding (h, b, Delta exact; SP exact except the 11-point
-NSGA-III front, ~5%).
+Source fronts: the bundled matched-budget (400k) example results, for both
+constraint formulations — equality (headline, examples/<case>/result.csv) and
+tolerance band (examples/<case>/band/result.csv), with the NSGA-II/III fronts
+read from the matching <prefix>pymoo_fronts.csv. HV here matches
+mo_matched_budget.py exactly (same union-normalization + staircase).
 
     python compute_mo_geometric.py
 """
@@ -34,6 +36,13 @@ ROOT = HERE.parent
 def _load(p):
     with open(p) as f:
         return list(csv.DictReader(f))
+
+
+def _idc_front(ex):
+    """Prefer result.csv (gitignored), fall back to the committed
+    expected_output.csv so a clean clone works without rebuilding."""
+    p = ex / "result.csv"
+    return _load(p if p.exists() else ex / "expected_output.csv")
 
 
 def _nondom_min(P):
@@ -104,22 +113,37 @@ def _report(case, fronts):
     print()
 
 
-def main() -> int:
-    ex = ROOT / "examples" / "moeed13"
-    fr = _load(ex / "moeed13_pymoo_fronts.csv"); idc = _load(ex / "result.csv")
-    _report("MOEED13", {
-        "IDC":   _nondom_min([(float(d["total_cost"]), float(d["total_emission"])) for d in idc]),
+def _moeed13(form):
+    # form: "" (equality, top level) or "band"
+    ex = ROOT / "examples" / "moeed13" / form
+    fr = _load(ex / "moeed13_pymoo_fronts.csv"); idc = _idc_front(ex)
+    return {
+        "IDC":      _nondom_min([(float(d["total_cost"]), float(d["total_emission"])) for d in idc]),
         "NSGA-II":  _nondom_min([(float(d["F_0"]), float(d["F_1"])) for d in fr if d["algorithm"] == "nsga2"]),
         "NSGA-III": _nondom_min([(float(d["F_0"]), float(d["F_1"])) for d in fr if d["algorithm"] == "nsga3"]),
-    })
+    }
 
-    cd = ROOT / "experiments" / "concrete_age28" / "results"
-    pf = _load(cd / "age28_fulldata_pymoo_fronts.csv"); ic = _load(cd / "age28_fulldata_idc_fronts.csv")
-    _report("UCI Concrete (age-28)", {
-        "IDC":      _nondom_min([(-float(d["F_0"]), float(d["F_1"])) for d in ic if d["seed"] == "0"]),
-        "NSGA-II":  _nondom_min([(float(d["F_0"]), float(d["F_1"])) for d in pf if d["algorithm"] == "nsga2" and d["seed"] == "42"]),
-        "NSGA-III": _nondom_min([(float(d["F_0"]), float(d["F_1"])) for d in pf if d["algorithm"] == "nsga3" and d["seed"] == "42"]),
-    })
+
+def _concrete(form):
+    # IDC result.csv stores strength (maximize) + cement (minimize); pymoo
+    # F_0 = -strength, F_1 = cement. Feed both as (-strength, cement) so the
+    # shared min/min nondom + normalization machinery applies uniformly.
+    ex = ROOT / "examples" / "concrete_uci_mo" / form
+    fr = _load(ex / "pymoo_fronts.csv"); idc = _idc_front(ex)
+    return {
+        "IDC":      _nondom_min([(-float(d["strength"]), float(d["cement"])) for d in idc]),
+        "NSGA-II":  _nondom_min([(float(d["F_0"]), float(d["F_1"])) for d in fr if d["algorithm"] == "nsga2"]),
+        "NSGA-III": _nondom_min([(float(d["F_0"]), float(d["F_1"])) for d in fr if d["algorithm"] == "nsga3"]),
+    }
+
+
+def main() -> int:
+    # Matched-budget (400k) fronts, both constraint formulations. Equality is
+    # the headline; band is the comparison. Source: the bundled examples/.
+    _report("MOEED13 (equality)",            _moeed13(""))
+    _report("MOEED13 (band)",                _moeed13("band"))
+    _report("UCI Concrete age-28 (equality)", _concrete(""))
+    _report("UCI Concrete age-28 (band)",     _concrete("band"))
     return 0
 
 

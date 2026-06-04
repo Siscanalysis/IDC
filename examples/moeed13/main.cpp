@@ -2,10 +2,16 @@
 //
 // Loads the trained 2-output OpenNN surrogate (13 generator setpoints -> total
 // cost, total NOx emission), declares the per-unit bounds and the
-// power-balance equality from problem.yaml, and runs multi-objective IDC to
+// power-balance constraint from problem.yaml, and runs multi-objective IDC to
 // recover the cost/emission Pareto front. Writes result.csv.
 //
-// Paths resolve relative to EXAMPLE_DIR (set by CMake).
+// Two constraint formulations are shipped (paper Section 8.3):
+//   * default (no argument): the EQUALITY formulation sum(P_i) == 1800 MW,
+//     read from EXAMPLE_DIR/problem.yaml, written to EXAMPLE_DIR/result.csv.
+//   * argv[1] == "band": the tolerance-BAND formulation 1800 +/- 0.5 MW, read
+//     from EXAMPLE_DIR/band/problem.yaml, written to EXAMPLE_DIR/band/result.csv.
+// The surrogate (nn/) is shared by both. Paths resolve relative to EXAMPLE_DIR
+// (set by CMake).
 
 #include <chrono>
 #include <filesystem>
@@ -31,14 +37,17 @@ namespace fs = std::filesystem;
 #define EXAMPLE_DIR "."
 #endif
 
-int main()
+int main(int argc, char** argv)
 {
     try
     {
         const fs::path dir        = EXAMPLE_DIR;
-        const fs::path nn_json    = dir / "nn" / "moeed13.json";
-        const fs::path yaml_path  = dir / "problem.yaml";
-        const fs::path result_csv = dir / "result.csv";
+        // Formulation: "" (default) = equality at top level; "band" = band/ subdir.
+        const std::string form    = (argc > 1) ? argv[1] : "";
+        const fs::path form_dir   = form.empty() ? dir : dir / form;
+        const fs::path nn_json    = dir / "nn" / "moeed13.json";   // shared surrogate
+        const fs::path yaml_path  = form_dir / "problem.yaml";
+        const fs::path result_csv = form_dir / "result.csv";
 
         // The true architecture (13 inputs -> hidden -> 2 outputs) is restored
         // by load(); the placeholder dimensions are overwritten.
@@ -79,9 +88,17 @@ int main()
         // Power-balance equality (|sum P_i - D| <= 0.5 MW) from the YAML.
         opennn_idc::apply_yaml_constraints(opt, yaml_path);
 
-        // Paper-default IDC configuration (Section 8.1).
-        opt.set_evaluations_number(2000);
+        // Matched-budget study (Section 8.3). IDC and the pymoo baselines are
+        // both held to the same TOTAL surrogate-evaluation budget. Per-point
+        // sampling is reduced 2000 -> 200 so IDC can refine over ~10 iterations
+        // within the budget instead of a few coarse ones, and the total is
+        // hard-capped so the count matches the baselines' budget exactly.
+        opt.set_evaluations_number(200);
         opt.set_iterations(20);
+        opt.set_max_total_evaluations(400000);
+        // Initial full-domain pass draws 10x the per-point sample count for a
+        // broader seed; the extra cost counts against the 400k matched cap.
+        opt.set_initial_sampling_factor(10);
         opt.set_zoom_factor(0.85f);
         opt.set_relative_tolerance(1e-6f);
 

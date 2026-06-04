@@ -8,7 +8,16 @@
 //
 // The paper's Section 8.5 trains the surrogate on the age-28 slice of the Yeh
 // dataset; this worked example ships the Growing-Neurons surrogate and
-// demonstrates the MO pipeline. Paths resolve relative to EXAMPLE_DIR.
+// demonstrates the MO pipeline.
+//
+// Two mass-balance formulations are shipped (paper Section 8.5):
+//   * default (no argument): the EQUALITY formulation sum(ingredients) == mu,
+//     mu = 2325.012558 kg/m^3 (mean age-28 dataset density; a fixed-to-mean
+//     modeling choice, not a physical equality), read from
+//     EXAMPLE_DIR/problem.yaml, written to EXAMPLE_DIR/result.csv.
+//   * argv[1] == "band": the tolerance-BAND formulation mu +/- 0.5 kg/m^3, read
+//     from EXAMPLE_DIR/band/problem.yaml, written to EXAMPLE_DIR/band/result.csv.
+// The surrogate (nn/) is shared by both. Paths resolve relative to EXAMPLE_DIR.
 
 #include <chrono>
 #include <filesystem>
@@ -34,14 +43,17 @@ namespace fs = std::filesystem;
 #define EXAMPLE_DIR "."
 #endif
 
-int main()
+int main(int argc, char** argv)
 {
     try
     {
         const fs::path dir        = EXAMPLE_DIR;
-        const fs::path nn_json    = dir / "nn" / "concrete_uci.json";
-        const fs::path yaml_path  = dir / "problem.yaml";
-        const fs::path result_csv = dir / "result.csv";
+        // Formulation: "" (default) = equality at top level; "band" = band/ subdir.
+        const std::string form    = (argc > 1) ? argv[1] : "";
+        const fs::path form_dir   = form.empty() ? dir : dir / form;
+        const fs::path nn_json    = dir / "nn" / "concrete_uci.json";   // shared surrogate
+        const fs::path yaml_path  = form_dir / "problem.yaml";
+        const fs::path result_csv = form_dir / "result.csv";
 
         // Surrogate architecture: 8 inputs -> 52 hidden -> 1 output (strength).
         ApproximationNetwork network({Index(8)}, Shape{Index(52)}, {Index(1)});
@@ -78,12 +90,18 @@ int main()
         // Six EN 206 / ASTM C595 affine constraints from the YAML.
         opennn_idc::apply_yaml_constraints(opt, yaml_path);
 
-        // Paper-default IDC configuration (Section 8.1).
-        opt.set_evaluations_number(2000);
+        // Matched-budget study (Section 8.3/8.5): same total surrogate-evaluation
+        // budget as the pymoo baselines. Per-point sampling 2000 -> 200 so IDC
+        // refines over more iterations within the budget; total hard-capped.
+        opt.set_evaluations_number(200);
         opt.set_iterations(20);
         opt.set_zoom_factor(0.85f);
         opt.set_relative_tolerance(1e-6f);
         opt.set_max_pareto_number(10000);   // empirical-front cap (safety bound)
+        opt.set_max_total_evaluations(400000);
+        // Initial full-domain pass draws 10x the per-point sample count for a
+        // broader seed; the extra cost counts against the 400k matched cap.
+        opt.set_initial_sampling_factor(10);
 
         const auto t0 = std::chrono::high_resolution_clock::now();
         MatrixR results = opt.perform_response_optimization();

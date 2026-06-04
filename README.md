@@ -14,7 +14,7 @@ built on top of the open-source library
 > surrogate-quality audit, the MO figure-regeneration, the pymoo/pycma
 > baselines for the three §8 example problems (`benchmarks/baselines/`),
 > and the in-tree datasets are present and runnable. OpenNN is pinned to the
-> immutable tag `v1.0-IDC-paper` for byte-reproducibility. Only the broader
+> immutable tag `v1.2-IDC-paper` for byte-reproducibility. Only the broader
 > ~30-problem benchmark catalog the paper's §8.1 points to and its baseline
 > sweep are run from the authors' workspace.
 

@@ -1,0 +1,4 @@
+algorithm,seed,n_pareto,hv,feasible_pct,mean_violation,evals,walltime_s,notes
+idc,0,927,nan,55.87918015102481,2.7920950320674892e-05,0,0.0,re-checked from result.csv
+nsga2,42,89,1463006.386642004,100.0,0.0,400000,493.07717230002163,
+nsga3,42,10,1069077.41104539,100.0,0.0,400000,486.879475499969,

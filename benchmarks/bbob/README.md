@@ -33,6 +33,43 @@ dependency that does not build on every Python version). If `cocoex` is
 unavailable, the script prints install hints and points you to the
 stress test below, which needs no COCO.
 
+### Scope, budget, and the matched-budget guarantee (§8.2)
+
+`bbob-biobj-mixint` spans **92** functions × **6** dimensions
+($n_c \in \{5,10,20,40,80,160\}$) × **15** instances, run for **21** seeds per
+cell. Every algorithm gets the **same per-problem evaluation budget** (default
+$5000$). The budget is matched in the strict sense: the BBOB functions are
+analytical (no surrogate), so IDC counts one evaluation per sampled point and
+*splits* its budget across the bi-objective weight scalarizations it solves —
+it is therefore, if anything, *conservatively* budgeted relative to the
+single-front population baselines. This is unlike the surrogate-model MO loop of
+§8.3/§8.5, where IDC's per-Pareto-point sampling must be capped explicitly
+(`set_max_total_evaluations`) to equalize the budget.
+
+### `coco_runner.py` — the per-problem backend
+
+`run_bbob_suites.py` delegates each run to `coco_runner.run_problem(...)`:
+- **baselines** (NSGA-II / NSGA-III / MOEA-D) are run exactly, via pymoo under
+  `MaximumFunctionCallTermination(budget)`;
+- **IDC** is run via a self-contained, budget-fair *reference* Python
+  interval-domain-contraction optimizer (weighted-sum scalarization, budget
+  split across $K$ weights, uniform-sample + contract). It reproduces the
+  qualitative §8.2 trend (IDC's advantage growing with dimension).
+
+**Provenance.** The paper's *headline* §8.2 numbers were produced with the
+authors' C++ MultiSeedIDC analytical solver (same budget-fair methodology) plus
+`cocopp` post-processing. Those authoritative win tallies are committed under
+[`results/bbob-biobj-mixint/`](results/bbob-biobj-mixint/)
+(`summary_idc_wins.csv`, `per_function_idc_wins.csv`), and the §8.2 **table is
+reproducible directly from them** — no re-run needed:
+
+```bash
+python parse_cocopp_idc_wins.py   # re-derives the win tallies from cocopp output
+cat results/bbob-biobj-mixint/summary_idc_wins.csv
+# bbob-biobj-mixint per dim 5..160: wins 63/59/70/85/90/91 of 92,
+# cell-win rate 0.67/0.57/0.70/0.91/0.98/1.00  (Table tab:bbob_biobj_mixint)
+```
+
 ## 2. `run_bbob_stress.py` — the §7.3 hard-multimodal stress test
 
 The f15–f24 hard-multimodal subset reported in §7.3 (limitations) as the
@@ -58,10 +95,14 @@ python run_bbob_stress.py --algorithms IDC            # IDC only (no cma/scipy d
 ## Outputs
 
 ```
-results/<suite>/<suite>_idc_vs_pymoo.csv   ← run_bbob_suites.py
-results/bbob/bbob_stress.csv               ← run_bbob_stress.py
+results/<suite>/<suite>_idc_vs_pymoo.csv         ← run_bbob_suites.py (per-run, gitignored)
+results/bbob/bbob_stress.csv                      ← run_bbob_stress.py (gitignored)
+results/bbob-biobj-mixint/summary_idc_wins.csv    ← COMMITTED §8.2 win tallies
+results/bbob-biobj-mixint/per_function_idc_wins.csv ← COMMITTED per-cell verdicts
 ```
 
-Both are gitignored. The suite win/tie/loss tallies are aggregated by
-the authors' workspace tooling (not bundled in this companion; see the
-"Not bundled" note in [`../README.md`](../README.md)).
+The per-run sweep CSVs are gitignored, but the **authoritative §8.2 win
+tallies are committed** (the two files above), so the §8.2 table reproduces
+from committed data via `parse_cocopp_idc_wins.py`. The other four COCO suites
+(catalog only, not shown in the paper) are aggregated by the authors' workspace
+tooling; see the "Not bundled" note in [`../README.md`](../README.md).

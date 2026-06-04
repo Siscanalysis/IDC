@@ -91,15 +91,17 @@ runner defaults reproduce them; the switches documented in
 [`../benchmarks/README.md`](../benchmarks/README.md) let you change them
 to explore configurations **not** shown in the paper.
 
-**IDC default configuration** (all §8 results unless noted):
+**IDC default configuration** (the SO §8 results unless noted):
 
 | Parameter | Symbol | Value |
 |-----------|--------|-------|
-| Candidates per iteration | `N` | 2000 |
+| Candidates per iteration | `N` | 2000 (SO); **200** for the matched-budget MO study |
 | Zoom factor | `γ` | 0.85 |
 | Max iterations (per-problem) | `I_max` | 5 to 20 |
 | Min iterations before termination | `I_min` | 4 |
 | Relative termination tolerance | `τ` | 1e-6 |
+| Total-evaluation cap | `set_max_total_evaluations` | unlimited (SO); **400,000** for the matched-budget MO study |
+| Initial-sampling factor | `set_initial_sampling_factor` | 1 (SO); **10** for the MO study (first full-domain pass draws 10·N, counted against the cap) |
 | Affine repair | — | every iteration |
 
 **Evaluation budget and seeds:**
@@ -107,13 +109,21 @@ to explore configurations **not** shown in the paper.
 | Case | § | Budget / seed | Seeds |
 |------|---|---------------|-------|
 | photo_pce10 (SO real) | 8.4 | 40,000 surrogate calls | 21 |
-| MOEED13 (simulator MO) | 8.3 | 40,000 surrogate calls | 21 |
-| concrete_uci_mo (MO real) | 8.5 | 40,000 surrogate calls (IDC side caps the empirical Pareto front at 10,000 points) | 21 |
-| BBOB bi-objective mixed-integer | 8.2 | COCO-recommended schedule; dims n_c ∈ {5,10,20,40,80,160}, 15 instances/cell | 21 |
+| MOEED13 (simulator MO) | 8.3 | **400,000 total** surrogate calls (matched cap; IDC `N=200` + `set_max_total_evaluations(400000)`, NSGA 100-pop to 400k) | 1 (deterministic) |
+| concrete_uci_mo (MO real) | 8.5 | **400,000 total** surrogate calls (matched cap; Pareto-front cap 10,000) | 1 (deterministic) |
+| BBOB bi-objective mixed-integer | 8.2 | matched per-problem budget (5,000); IDC splits across weight scalarizations (conservative); dims n_c ∈ {5,10,20,40,80,160}, 15 instances/cell | 21 |
+
+Each MO example runs **two constraint formulations**: an equality (headline,
+top-level `problem.yaml` → `result.csv`) and a tolerance band
+(`band/problem.yaml` → `band/result.csv`); run `./bin/<example>` then
+`./bin/<example> band`. Why the MO budget differs from the nominal 40,000: IDC's
+MO loop samples per Pareto point per iteration, so a matched budget requires the
+explicit total-evaluation cap (see §8.3).
 
 **Baselines** (all run against the *same* trained surrogate as IDC, at
 the matched budget): single-objective — CMA-ES via `pycma`, plus DE, GA,
-PSO via `pymoo`; multi-objective — NSGA-II, NSGA-III, MOEA/D via `pymoo`.
+PSO via `pymoo` (40,000); multi-objective — NSGA-II, NSGA-III, MOEA/D via
+`pymoo` (400,000; `--subdir band` for the band formulation).
 
 **Held-out protocol** (the SO real-application case, §8.4 photo_pce10):
 top-5% by objective held out, `S = 5` surrogate-training seeds, 80%

@@ -40,6 +40,11 @@ Thumbs.db
 # Reproduction outputs
 benchmarks/results/
 benchmarks/**/results/
+# ...but keep the committed §8.2 BBOB win tallies (the source of Table
+# tab:bbob_biobj_mixint; reproducible from cocopp via parse_cocopp_idc_wins.py).
+!benchmarks/bbob/results/
+!benchmarks/bbob/results/bbob-biobj-mixint/
+!benchmarks/bbob/results/bbob-biobj-mixint/*.csv
 examples/**/result.csv
 examples/**/output/
 *.log

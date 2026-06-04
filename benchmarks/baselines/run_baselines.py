@@ -162,11 +162,14 @@ def run_so(problem: OpennnProblem, algo_name: str, seed: int, budget: int) -> di
     f_signed = problem.signed_objective(x_best)
     f_signed = f_signed if isinstance(f_signed, float) else float(f_signed[0])
     ok, viol = problem.feasible(x_best)
-    return {
+    rec = {
         "algorithm": algo_name, "seed": seed, "best_f": float(f_signed),
         "feasible": ok, "max_violation": viol, "evals": _n_eval(res, budget),
         "walltime_s": walltime, "notes": notes,
     }
+    for j, xj in enumerate(np.asarray(x_best).ravel()):
+        rec[f"x_{j}"] = float(xj)
+    return rec
 
 
 def run_mo(problem: OpennnProblem, algo_name: str, seed: int, budget: int):
@@ -206,11 +209,11 @@ def run_mo(problem: OpennnProblem, algo_name: str, seed: int, budget: int):
     return summary, F, X
 
 
-def idc_from_result(problem: OpennnProblem, example: str):
+def idc_from_result(problem: OpennnProblem, example: str, subdir: str = ""):
     """Best-effort: re-check the bundled C++ IDC result.csv against the same
     constraints. Returns (so_row | mo_row, F, X) or None if result.csv is
     absent / its columns can't be matched (then run the C++ example first)."""
-    rcsv = EXAMPLES / example / "result.csv"
+    rcsv = EXAMPLES / example / subdir / "result.csv"
     note = "re-checked from result.csv"
     if not rcsv.exists():
         # fall back to the committed smoke-test reference if present
@@ -260,7 +263,8 @@ def idc_from_result(problem: OpennnProblem, example: str):
 def _write(rows: list[dict], path: Path) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     with open(path, "w", newline="", encoding="utf-8") as f:
-        w = csv.DictWriter(f, fieldnames=list(rows[0].keys()))
+        fieldnames = list(dict.fromkeys(k for r in rows for k in r))
+        w = csv.DictWriter(f, fieldnames=fieldnames)
         w.writeheader()
         w.writerows(rows)
     print(f"[OK] wrote {len(rows)} row(s) -> {path}")
@@ -275,22 +279,30 @@ def main() -> int:
     ap.add_argument("--seed", type=int, default=42)
     ap.add_argument("--seeds", type=int, default=None,
                     help="run seeds 42..42+N-1 (overrides --seed)")
-    ap.add_argument("--budget", type=int, default=40000)
+    ap.add_argument("--budget", type=int, default=40000,
+                    help="total function-evaluation budget per seed. The §8.3/§8.5 "
+                         "matched-budget MO study uses 400000 (to match IDC's "
+                         "set_max_total_evaluations cap); the §8.4 SO study uses 40000.")
+    ap.add_argument("--subdir", default="",
+                    help="formulation subdirectory under examples/<example>/ "
+                         "(e.g. 'band' for the tolerance-band MO formulation; "
+                         "empty = the top-level equality formulation).")
     ap.add_argument("--out", type=Path, default=None)
     ap.add_argument("--nn-py", type=Path, default=None, dest="nn_py",
                     help="Override the surrogate .py (e.g. a held-out surrogate "
                          "from benchmarks/holdout/train_surrogate).")
     args = ap.parse_args()
 
-    yaml_path = EXAMPLES / args.example / "problem.yaml"
+    yaml_path = EXAMPLES / args.example / args.subdir / "problem.yaml"
     if not yaml_path.exists():
         print(f"[ERROR] no problem.yaml at {yaml_path}", file=sys.stderr)
         return 1
 
-    nn = load_nn(args.example, args.nn_py)
+    nn = load_nn(args.example, args.nn_py)   # surrogate is shared across formulations
     problem = OpennnProblem(yaml_path, nn)
     seeds = (list(range(42, 42 + args.seeds)) if args.seeds else [args.seed])
-    out = args.out or (HERE / "results" / f"{args.example}_baselines.csv")
+    tag = f"{args.example}{('_' + args.subdir) if args.subdir else ''}"
+    out = args.out or (HERE / "results" / f"{tag}_baselines.csv")
 
     if problem._is_mo:
         algos = list(_mo_algorithms(problem)) if args.algo == "all" else [args.algo]
@@ -303,7 +315,7 @@ def main() -> int:
                       f"feas%={s['feasible_pct']:.1f} mean_viol={s['mean_violation']:.2e}")
                 summaries.append(s)
                 fronts.append((algo, seed, F, X))
-        idc = idc_from_result(problem, args.example)
+        idc = idc_from_result(problem, args.example, args.subdir)
         if idc is not None:
             summaries.insert(0, idc[0])
         _write(summaries, out)
@@ -328,7 +340,7 @@ def main() -> int:
                 print(f"   best_f={r['best_f']:.5g} feasible={r['feasible']} "
                       f"max_violation={r['max_violation']:.2e}")
                 rows.append(r)
-        idc = idc_from_result(problem, args.example)
+        idc = idc_from_result(problem, args.example, args.subdir)
         if idc is not None:
             rows.insert(0, idc[0])
         _write(rows, out)

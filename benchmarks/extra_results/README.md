@@ -19,37 +19,22 @@ sweep.
 
 | File | What it is |
 |------|-----------|
-| `so_holdout_top05_per_entry.csv` | Single-objective top-5% holdout cross-table over 15 catalog problems, 5 surrogate seeds each. Four metrics per (entry, optimizer): `absolute_gap`, `relative_gap` (value-space), `absolute_geo`, `relative_geo` (input-space), reported as median/p25/p75. IDC is run at 5 configs (`idc_default` + 4 sweep variants); pymoo at cmaes/de/ga/pso. |
 | `mo_catalog_hv_igd.csv` | Multi-objective catalog: hypervolume (HV, higher better) per (problem, algorithm) at the 40k matched budget, IDC vs NSGA-II / NSGA-III / MOEA/D. (The `igd` column is a legacy extra; the paper ranks by HV and reports the geometric front-quality metrics, not IGD.) |
 | `photo_pce10_convergence.csv` | Convergence trace for the §8.4 figure: best feasible photo-degradation vs surrogate evaluations for IDC and the SO baselines, averaged over the five top-5% holdout surrogates. Rendered by [`../make_convergence_figure.py`](../make_convergence_figure.py). |
 
-> **Metric note.** This SO cross-table uses the earlier **four-metric**
-> variant of the holdout protocol (`absolute_gap` / `relative_gap` for
-> value-space, `absolute_geo` / `relative_geo` for input-space). It
-> captures the same value-vs-space distinction as the paper's consolidated
-> **two-metric** `value_gap` / `space_gap` pair, which is what the headline
-> §8.4 / §8.5 case studies report. See
-> [`../../docs/holdout_procedure.md`](../../docs/holdout_procedure.md).
+## Single-objective held-out diagnostics (value_gap / space_gap)
 
-## Headline single-objective reads (input-space recovery)
-
-The paper's central reliability claim is that IDC recovers the *region*
-of the held-out optimum in **input space**, not just a surrogate-pleasing
-value. `relative_geo` (median, `idc_default` vs the best pymoo baseline;
-lower = closer to the held-out optimum) bears this out:
-
-| Problem | IDC `relative_geo` | best pymoo `relative_geo` | IDC advantage |
-|---------|-------------------|---------------------------|---------------|
-| yacht_hydrodynamics | 0.232 | 0.744 | ~3.2× closer |
-| olympus_fullerenes | 0.138 | 0.448 | ~3.2× closer |
-| olympus_hplc | 0.193 | 0.414 | ~2.1× closer |
-| olympus_oer_plate_3851 | 0.067 | 0.111 (ga) | ~1.7× closer |
-| concrete_compressive_strength | 0.368 | 0.519 | ~1.4× closer |
-
-(pymoo often edges IDC on the *value* gap by pushing the surrogate into
-extrapolation at a distant point — exactly the failure mode the
-input-space metric is designed to expose. See
-[`../../docs/holdout_procedure.md`](../../docs/holdout_procedure.md).)
+The §8.4 held-out diagnostics use the two-metric `value_gap` / `space_gap`
+pair (§8.1 of the paper) and are **reproduced from a clean clone** by the
+held-out pipeline in [`../holdout/`](../holdout/):
+`gen_holdout_splits.py` → `train_surrogate` (OpenNN Growing Neurons on the
+top-5% split) → IDC / `baselines/run_baselines.py` →
+`compute_holdout_gaps.py`. On the representative photo_pce10 held-out
+seed, IDC has the smallest `value_gap` (it reaches the held-out
+surrogate's feasible optimum) while every algorithm's `space_gap` is
+small. The broader single-objective catalog held-out cross-table
+(15 problems) is maintained in the authors' workspace and is not bundled
+here. See [`../../docs/holdout_procedure.md`](../../docs/holdout_procedure.md).
 
 ## Headline multi-objective reads (HV at 40k budget)
 

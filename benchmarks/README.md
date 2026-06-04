@@ -124,7 +124,7 @@ the three §8 example problems (`baselines/run_baselines.py`) all run today
 and reproduce the results shown explicitly in the paper. Only the broader
 ~30-problem benchmark catalog (the §8.1 catalog) and its baseline sweep are
 maintained in the authors' working tree (`experiments/IDC_benchmark/`);
-OpenNN is pinned to the immutable tag `v1.0-IDC-paper` for
+OpenNN is pinned to the immutable tag `v1.2-IDC-paper` for
 byte-reproducibility.
 
 ## Per-problem CSV schema

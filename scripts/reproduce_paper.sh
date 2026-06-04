@@ -28,17 +28,19 @@ cmake --build build --config Release -j
 {
   echo "# Provenance for the result CSVs and figures produced by this run"
   echo "companion_repo_commit: $(git -C "$ROOT" rev-parse HEAD 2>/dev/null || echo 'unknown (not a git checkout)')"
-  echo "opennn_tag: ${OPENNN_TAG:-v1.0-IDC-paper}"
+  echo "opennn_tag: ${OPENNN_TAG:-v1.2-IDC-paper}"
   if [ -d "$ROOT/build/_deps/opennn-src/.git" ]; then
     echo "opennn_commit: $(git -C "$ROOT/build/_deps/opennn-src" rev-parse HEAD 2>/dev/null || echo unknown)"
   fi
 } > "$ROOT/RESULTS_PROVENANCE.txt"
 echo "    provenance -> RESULTS_PROVENANCE.txt"
 
-echo "==> [2/8] Run the three C++ case studies"
-"$ROOT/build/bin/moeed13"          # §8.3 simulator MO
-"$ROOT/build/bin/photo_pce10"      # §8.4 real SO
-"$ROOT/build/bin/concrete_uci_mo"  # §8.5 real MO
+echo "==> [2/8] Run the three C++ case studies (MO examples: equality + band)"
+"$ROOT/build/bin/moeed13"               # §8.3 simulator MO — equality (headline)
+"$ROOT/build/bin/moeed13" band          # §8.3 simulator MO — tolerance band
+"$ROOT/build/bin/photo_pce10"           # §8.4 real SO
+"$ROOT/build/bin/concrete_uci_mo"       # §8.5 real MO — equality (headline)
+"$ROOT/build/bin/concrete_uci_mo" band  # §8.5 real MO — tolerance band
 
 echo "==> [3/8] BBOB analytical validation (§8.2) + f15-f24 stress test (§7.3)"
 python benchmarks/bbob/run_bbob_suites.py || echo "    (cocoex not installed; see benchmarks/bbob/README.md)"
@@ -51,16 +53,24 @@ echo "==> [5/8] photo_pce10 21-seed sweep + aggregate (§8.4)"
 python benchmarks/run_idc_21seeds.py
 python benchmarks/aggregate_21seeds.py
 
-echo "==> [6/8] pymoo/pycma baselines for the three §8 example problems"
+echo "==> [6/8] pymoo/pycma baselines for the §8 example problems"
+# §8.4 SO sweep at the 40k SO budget; §8.3/§8.5 MO at the matched 400k budget,
+# both constraint formulations (equality top-level + band subdir).
 python benchmarks/baselines/run_baselines.py --example photo_pce10     --seeds 21 || echo "    (pymoo/cma not installed; see benchmarks/requirements.txt)"
-python benchmarks/baselines/run_baselines.py --example concrete_uci_mo --seed  42 || true
-python benchmarks/baselines/run_baselines.py --example moeed13         --seed  42 || true
+python benchmarks/baselines/run_baselines.py --example concrete_uci_mo --seed 42 --budget 400000 || true
+python benchmarks/baselines/run_baselines.py --example concrete_uci_mo --seed 42 --budget 400000 --subdir band || true
+python benchmarks/baselines/run_baselines.py --example moeed13         --seed 42 --budget 400000 || true
+python benchmarks/baselines/run_baselines.py --example moeed13         --seed 42 --budget 400000 --subdir band || true
 
 echo "==> [7/8] Surrogate-quality audit (§8.5)"
 python benchmarks/audit_surrogates.py
 
-echo "==> [8/8] Regenerate §8 MO figures from committed CSVs"
-python benchmarks/make_figures.py
+echo "==> [8/8] Regenerate §8 MO figures + matched-budget tables from committed CSVs"
+# Matched-budget normalized-HV figures (equality + band) and the machine-readable
+# results summary (Tables tab:case_moeed13 / tab:case_concrete_mo + residual tables).
+python benchmarks/mo_matched_budget.py
+python benchmarks/compute_mo_geometric.py    # geometric front-quality diagnostics
+python benchmarks/make_figures.py            # IDC Pareto-front scatter views
 python benchmarks/make_convergence_figure.py || echo "    (convergence trace optional)"
 
 echo "==> Done. Example outputs in examples/<name>/result.csv; figures in benchmarks/figures/"

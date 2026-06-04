@@ -34,7 +34,7 @@ references:
   - type: software
     title: OpenNN
     repository-code: "https://github.com/Artelnics/opennn"
-    version: "v1.0-IDC-paper"
+    version: "v1.2-IDC-paper"
 preferred-citation:
   type: article
   authors:

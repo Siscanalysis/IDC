@@ -6,7 +6,8 @@ scipy>=1.10            # DE baseline in run_bbob_stress.py
 cma>=3.3               # CMA-ES (pycma) baseline
 pymoo>=0.6.1           # NSGA-II / NSGA-III / MOEA/D / DE / GA / PSO baselines
 matplotlib>=3.7        # make_figures.py
-pandas>=2.0            # aggregate_21seeds.py
+pandas>=2.0            # aggregate_21seeds.py and the exported NN .py modules
+pyyaml>=6.0            # problem.yaml parsing in baselines/run_baselines.py
 
 # Optional — only needed for specific runners:
 # cocoex               # official COCO binding for bbob/run_bbob_suites.py

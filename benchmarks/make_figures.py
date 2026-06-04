@@ -1,7 +1,14 @@
 #!/usr/bin/env python3
 """
-make_figures.py — regenerate the paper's §8 multi-objective figures from the
-committed result CSVs.
+make_figures.py — render this companion's §8 multi-objective illustration
+figures from the committed result CSVs.
+
+Scope: these are the IDC-only views reproducible from the bundled artifacts —
+the concrete (§8.5) and MOEED13 (§8.3) IDC Pareto fronts (each from its
+example's expected_output.csv) plus a catalog-wide mean-HV bar chart. The
+paper's full multi-algorithm figures (the IDC-vs-NSGA-II/III overlays and the
+normalized-hypervolume panels) are produced from the authors' workspace, since
+the pymoo baselines are not bundled here.
 
 Self-contained: reads only files shipped in this repository
 (`examples/<case>/expected_output.csv` and `benchmarks/extra_results/*.csv`),
@@ -81,6 +88,10 @@ def mo_catalog_hv() -> None:
         print(f"[skip] {csv} missing")
         return
     df = pd.read_csv(csv)
+    # Drop catalog rows with no model/HV (status meta:* -> algorithm "(meta)",
+    # e.g. concrete_uci_mo and perovskite_database), so they don't show up as a
+    # spurious NaN bar in the mean.
+    df = df[df["hv"].notna() & ~df["algorithm"].astype(str).str.startswith("(meta)")]
     piv = df.groupby("algorithm")["hv"].mean().sort_values(ascending=False)
     fig, ax = plt.subplots(figsize=(4.8, 3.0))
     ax.bar(range(len(piv)), piv.values, color=palette(len(piv)))

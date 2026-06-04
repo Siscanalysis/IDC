@@ -133,9 +133,11 @@ formula_constraints:
   # near-record values, and pymoo's extrapolation peak naturally disappears.
 
 budget:
-  total_nn_evaluations: 40000
-  idc_per_iteration: 200
-  idc_max_iterations: 3
+  # §8.1 default IDC configuration (what main.cpp hardcodes for this example).
+  total_nn_evaluations: 40000   # = idc_per_iteration * idc_max_iterations
+  idc_per_iteration: 2000       # N  (main.cpp: set_evaluations_number(2000))
+  idc_max_iterations: 20        # I_max (main.cpp: set_iterations(20))
+  idc_max_pareto: 10000         # empirical-front cap (main.cpp: set_max_pareto_number)
 
 seeds:
   count: 21

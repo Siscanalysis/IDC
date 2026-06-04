@@ -11,11 +11,12 @@ built on top of the open-source library
 
 > **Status.** The C++ worked examples (§8.3–§8.5), the BBOB / Olympus
 > validation runners, the `photo_pce10` 21-seed sweep + aggregation, the
-> surrogate-quality audit, the MO figure-regeneration, and the in-tree
-> datasets are present and runnable. OpenNN is pinned to the immutable tag
-> `v1.0-IDC-paper` for byte-reproducibility. The broader ~30-problem
-> benchmark catalog the paper's §8.1 points to and the pymoo/pycma
-> baseline comparison are run from the authors' workspace.
+> surrogate-quality audit, the MO figure-regeneration, the pymoo/pycma
+> baselines for the three §8 example problems (`benchmarks/baselines/`),
+> and the in-tree datasets are present and runnable. OpenNN is pinned to the
+> immutable tag `v1.0-IDC-paper` for byte-reproducibility. Only the broader
+> ~30-problem benchmark catalog the paper's §8.1 points to and its baseline
+> sweep are run from the authors' workspace.
 
 ---
 
@@ -64,8 +65,10 @@ seconds; the BBOB / Olympus runners take longer, dominated by the pymoo
 baselines (IDC itself is sub-second per seed). It then runs the
 photo_pce10 21-seed sweep + aggregation, renders the surrogate-quality
 audit, and regenerates the §8 MO figures from the committed result CSVs.
-The broader ~30-problem benchmark catalog (the §8.1 catalog), the
-pymoo/pycma baseline comparison, and the holdout cross-table are run
+The pymoo/pycma baselines for the three §8 example problems ship in
+`benchmarks/baselines/` and run on the same surrogate + YAML as the C++
+binaries. Only the broader ~30-problem benchmark catalog (the §8.1
+catalog) and its baseline sweep, plus the SO holdout cross-table, are run
 from the authors' workspace and are not bundled in this companion.
 
 ---
@@ -104,6 +107,10 @@ paper:
   suite (default `bbob-biobj-mixint`, the only one shown explicitly)
 - `bbob/run_bbob_stress.py` — the f15–f24 hard-multimodal stress test
   (§7.3 limitations)
+- `baselines/run_baselines.py` — pymoo/pycma baselines (CMA-ES/DE/GA/PSO,
+  NSGA-II/III/MOEA-D) for the three §8 example problems, on the same
+  surrogate + YAML as the C++ IDC binaries; emits feasibility and the mean
+  constraint-violation magnitude (see [`benchmarks/baselines/`](benchmarks/baselines/))
 - `make_convergence_figure.py` — regenerates the §8.4 convergence figure
   from the committed `extra_results/` CSVs
 - `requirements.txt` — Python dependencies for the runners

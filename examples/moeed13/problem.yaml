@@ -68,7 +68,7 @@ objectives:
 # from a large NSGA-II run (50k evals × 21 seeds via the analytical function).
 known_pareto_front:
   type: empirical_reference
-  source: "Built by running NSGA-II directly on the analytical cost+emission with a high budget; the resulting non-dominated set is used as IGD reference for IDC and surrogate-based runs."
+  source: "Built by running NSGA-II directly on the analytical cost+emission with a high budget; the resulting non-dominated set is used as the reference Pareto set for IDC and surrogate-based runs."
 
 budget:
   total_nn_evaluations: 40000

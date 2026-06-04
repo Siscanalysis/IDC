@@ -12,6 +12,9 @@ benchmarks/
 ├── requirements.txt         ← pip dependencies
 ├── run_olympus.py           ← Olympus real-data runner; --task switch (default photo_pce10)
 ├── make_convergence_figure.py ← renders the §8.4 photo_pce10 convergence-vs-budget figure
+├── baselines/               ← pymoo/pycma baselines for the §8 examples (see its README)
+│   ├── problem_pymoo.py     ← shared YAML+NN problem (feasibility + max_violation)
+│   └── run_baselines.py     ← CMA-ES/DE/GA/PSO (SO) and NSGA-II/III/MOEA-D (MO)
 ├── extra_results/           ← committed result snapshots beyond §8 (see its README)
 ├── bbob/
 │   ├── README.md            ← BBOB switch reference
@@ -26,10 +29,12 @@ benchmarks/
 > **Scope.** `run_idc_21seeds.py` + `aggregate_21seeds.py` ship here and
 > sweep the single-objective `photo_pce10` example over 21 seeds;
 > `make_figures.py` and `audit_surrogates.py` also ship (figures from the
-> committed result CSVs, and the surrogate-quality R² audit). The broader
-> ~30-problem benchmark catalog (the §8.1 catalog) and the pymoo/pycma
-> baseline comparison are run from the authors' workspace (the catalog
-> drivers live in `experiments/IDC_benchmark/`).
+> committed result CSVs, and the surrogate-quality R² audit). The pymoo/pycma
+> baselines for the three §8 example problems (photo_pce10, concrete_uci_mo,
+> moeed13) ship in [`baselines/`](baselines/) and run on the same surrogate +
+> YAML as the C++ IDC binaries. Only the broader ~30-problem benchmark catalog
+> (the §8.1 catalog) and its baseline sweep are run from the authors' workspace
+> (the catalog drivers live in `experiments/IDC_benchmark/`).
 
 ## What maps to which §
 
@@ -66,7 +71,7 @@ problem/suite/task that is not shown explicitly in the manuscript, so it
 is always clear when output falls outside the paper's reported scope.
 
 Committed result snapshots for the broader catalog (single-objective
-top-5% holdout over 15 problems, and the multi-objective HV/IGD table)
+top-5% holdout over 15 problems, and the multi-objective HV table)
 live in [`extra_results/`](extra_results/) — these are the "additional
 reproducible tests" the manuscript points to.
 
@@ -113,10 +118,11 @@ itself runs in well under a second per seed.
 The bundled runners (`run_olympus.py`, `bbob/run_bbob_suites.py`,
 `bbob/run_bbob_stress.py`, `make_convergence_figure.py`), the
 `photo_pce10` 21-seed sweep (`run_idc_21seeds.py` + `aggregate_21seeds.py`),
-the surrogate-quality audit (`audit_surrogates.py`), and the MO
-figure-regeneration (`make_figures.py`) all run today and reproduce the
-results shown explicitly in the paper. The broader ~30-problem benchmark
-catalog (the §8.1 catalog) and the pymoo/pycma baseline comparison are
+the surrogate-quality audit (`audit_surrogates.py`), the MO
+figure-regeneration (`make_figures.py`), and the pymoo/pycma baselines for
+the three §8 example problems (`baselines/run_baselines.py`) all run today
+and reproduce the results shown explicitly in the paper. Only the broader
+~30-problem benchmark catalog (the §8.1 catalog) and its baseline sweep are
 maintained in the authors' working tree (`experiments/IDC_benchmark/`);
 OpenNN is pinned to the immutable tag `v1.0-IDC-paper` for
 byte-reproducibility.

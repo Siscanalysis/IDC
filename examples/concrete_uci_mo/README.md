@@ -109,6 +109,20 @@ The Pareto front plot is reported in the §8.5 Pareto-front figure of the
 paper; the internal-gap and boundary-gap stability metrics in the §8.5
 results table.
 
+**Reproducibility scope.** This example runs the **IDC** side only (the
+default §8.1 config: $N=2000$, $I_{\max}=20$, seed $0$, Pareto cap
+$10\,000$, hardcoded in `main.cpp`). On the pinned OpenNN tag it returns
+the §8.5 IDC front to within run-to-run / build variation
+($\approx 5{,}500$ points, strength maximum $\approx 77.6$ MPa); the
+committed `expected_output.csv` is the smoke-test reference for that run.
+The full IDC-vs-NSGA-II/III comparison, the per-algorithm
+constraint-violation figures, and the §8.5 normalized-hypervolume and
+3-front overlay plots are produced from the authors' workspace (the
+pymoo baselines are not bundled here, as noted in the top-level README).
+To make the paper and this example byte-identical, regenerate
+`expected_output.csv` with `./bin/concrete_uci_mo` on the pinned tag and
+report that run's exact $|\mathcal{P}|$ and strength maximum in §8.5.
+
 ## Why this is interesting
 
 This example illustrates the **dynamic utopian-point update**

@@ -20,7 +20,7 @@ sweep.
 | File | What it is |
 |------|-----------|
 | `so_holdout_top05_per_entry.csv` | Single-objective top-5% holdout cross-table over 15 catalog problems, 5 surrogate seeds each. Four metrics per (entry, optimizer): `absolute_gap`, `relative_gap` (value-space), `absolute_geo`, `relative_geo` (input-space), reported as median/p25/p75. IDC is run at 5 configs (`idc_default` + 4 sweep variants); pymoo at cmaes/de/ga/pso. |
-| `mo_catalog_hv_igd.csv` | Multi-objective catalog: hypervolume (HV, higher better) and IGD (lower better) per (problem, algorithm) at the 40k matched budget, IDC vs NSGA-II / NSGA-III / MOEA/D. |
+| `mo_catalog_hv_igd.csv` | Multi-objective catalog: hypervolume (HV, higher better) per (problem, algorithm) at the 40k matched budget, IDC vs NSGA-II / NSGA-III / MOEA/D. (The `igd` column is a legacy extra; the paper ranks by HV and reports the geometric front-quality metrics, not IGD.) |
 | `photo_pce10_convergence.csv` | Convergence trace for the §8.4 figure: best feasible photo-degradation vs surrogate evaluations for IDC and the SO baselines, averaged over the five top-5% holdout surrogates. Rendered by [`../make_convergence_figure.py`](../make_convergence_figure.py). |
 
 > **Metric note.** This SO cross-table uses the earlier **four-metric**
@@ -51,13 +51,13 @@ extrapolation at a distant point — exactly the failure mode the
 input-space metric is designed to expose. See
 [`../../docs/holdout_procedure.md`](../../docs/holdout_procedure.md).)
 
-## Headline multi-objective reads (HV / IGD at 40k budget)
+## Headline multi-objective reads (HV at 40k budget)
 
 | Problem | IDC HV | best pymoo HV | Verdict |
 |---------|--------|---------------|---------|
-| moeed13 | **2,948,429** (IGD **1.75**) | 2,448,850 (NSGA-II, IGD 193.9) | IDC wins HV +20% and IGD decisively |
+| moeed13 | **2,948,429** | 2,448,850 (NSGA-II) | IDC wins HV +20% |
 | lnp3 | **943,499** | 33,645 | IDC wins HV ~28× |
-| biochar_ec | 49.1 (IGD **0.0015**) | 60.8 (NSGA-II, IGD 0.13) | split: pymoo wins HV, IDC wins IGD + Pareto density |
+| biochar_ec | 49.1 | 60.8 (NSGA-II) | split: pymoo wins HV, IDC wins on Pareto density |
 | suzuki_i / ii / iv | 1,553 / 643 / 1,862 | 1,753 / 672 / 2,176 | pymoo wins HV narrowly (5–17%) |
 
 `moeed13` is the validation case promoted into the manuscript (§8.3);

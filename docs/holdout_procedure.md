@@ -106,7 +106,9 @@ The two metrics together give a $2 \times 2$ read:
 | Ideal | ≈ 0 | ≈ 0 | rediscovered the argmax in value **and** input space |
 | Honest progress | ∈ (0, 1) | < 1 | extrapolated past the training peak, sensible region |
 | No improvement | ≥ 1 | ≥ 1 | failed to reach past the training peak |
-| Surrogate hallucination | < 0 | > 1 | surrogate predicts past the data best, but far from the argmax — the failure mode the protocol is designed to expose |
+| Surrogate hallucination | < 0 | > 1 | surrogate predicts past the data best, but far from the argmax — the failure mode the protocol **guards against** |
+
+> **Note on the cap.** Step 6 clamps the surrogate output at the truncated-training maximum, so a capped run cannot enter the `value_gap < 0` regime by construction: the cap *prevents* hallucination rather than letting the diagnostic observe it (seeing `value_gap < 0` would mean the cap was disabled). The explicit detector of the same risk is the count of returned points whose prediction exceeds the measured data ceiling, used directly on the un-capped multi-objective Concrete case.
 
 ---
 
@@ -198,4 +200,6 @@ rather than by the value/space-gap pair above.
   IDC with active learning.
 
 - It does not measure feasibility separately; constraint satisfaction is
-  reported in a separate column of the §8.4 / §8.5 held-out tables.
+  reported in a separate feasibility column of the §8.4 held-out table
+  and of the §8.5 Concrete results table (the latter under the strict
+  yaml-constraint filter, not a held-out split).

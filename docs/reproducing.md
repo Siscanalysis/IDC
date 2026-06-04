@@ -4,10 +4,11 @@ This document gives the recipe to build and run the §8 worked examples
 and validation sweeps from a clean clone of this repository. The bundled
 tooling covers the three C++ case studies (§8.3–§8.5), the BBOB / Olympus
 validation runners, the `photo_pce10` 21-seed sweep + aggregation, the
-surrogate-quality audit, and the MO figure-regeneration. The broader
-~30-problem benchmark catalog the paper's §8.1 points to and the
-pymoo/pycma baseline comparison are part of the authors' workspace and
-are not shipped here.
+surrogate-quality audit, the MO figure-regeneration, and the pymoo/pycma
+baselines for the three §8 example problems
+([`benchmarks/baselines/`](../benchmarks/baselines/)). Only the broader
+~30-problem benchmark catalog the paper's §8.1 points to and its baseline
+sweep are part of the authors' workspace and are not shipped here.
 
 For the conceptual overview of IDC, see [architecture.md](architecture.md).
 For the memorization/hallucination safeguards used in the §8.4 (top-5%
@@ -101,11 +102,6 @@ to explore configurations **not** shown in the paper.
 | Relative termination tolerance | `τ` | 1e-6 |
 | Affine repair | — | every iteration |
 
-For the multi-objective continuous-front problems (CONSTR / ZDT1,
-discussed in §6 termination) the configuration is reduced to `N = 200`,
-`I_max = 3` — a temporary setting flagged in the paper as under study in
-the follow-up project.
-
 **Evaluation budget and seeds:**
 
 | Case | § | Budget / seed | Seeds |
@@ -119,9 +115,11 @@ the follow-up project.
 the matched budget): single-objective — CMA-ES via `pycma`, plus DE, GA,
 PSO via `pymoo`; multi-objective — NSGA-II, NSGA-III, MOEA/D via `pymoo`.
 
-**Held-out protocol** (the two real-application cases, §8.4 / §8.5):
+**Held-out protocol** (the SO real-application case, §8.4 photo_pce10):
 top-5% by objective held out, `S = 5` surrogate-training seeds, 80%
-subsample of the remaining rows, 5 × 21 = 105 runs per algorithm. See
+subsample of the remaining rows, 5 × 21 = 105 runs per algorithm. The
+§8.5 Concrete case is **not** held out — it uses the age-28 restriction
+plus the measured data ceiling instead (see below). See
 [holdout_procedure.md](holdout_procedure.md).
 
 ---
@@ -167,6 +165,12 @@ python aggregate_21seeds.py       # per-problem summary (mean ± std, best, feas
 python audit_surrogates.py        # §8.5 surrogate-quality R² audit table
 python make_figures.py            # §8 MO figures from committed CSVs
 python make_convergence_figure.py # §8.4 best-feasible-vs-evaluations figure
+
+# pymoo/pycma baselines for the three §8 example problems (same surrogate +
+# YAML as the C++ IDC binaries; emits feasibility + mean constraint violation):
+python baselines/run_baselines.py --example photo_pce10     --seeds 21
+python baselines/run_baselines.py --example concrete_uci_mo --seed  42
+python baselines/run_baselines.py --example moeed13         --seed  42
 ```
 
 Expected runtime: on the order of a couple of hours on a recent multi-core
@@ -176,12 +180,14 @@ examples alone finish in seconds. (`run_idc_21seeds.py` on `photo_pce10`
 finishes in about a second total — 21 sub-second seeds.)
 
 Each runner writes under `benchmarks/results/`; the 21-seed summary lands
-in `benchmarks/results/branch_a/photo_pce10_summary_21seeds.csv` and the
-figures in `benchmarks/figures/`. The broader ~30-problem benchmark
-catalog (the §8.1 catalog) and the pymoo/pycma baselines from the
-authors' development workspace are **not** bundled in this companion;
-the §8 headline numbers
-are reproduced by the C++ worked examples (Step 3), the 21-seed sweep, and
+in `benchmarks/results/branch_a/photo_pce10_summary_21seeds.csv`, the
+baseline tables in `benchmarks/baselines/results/<example>_baselines.csv`,
+and the figures in `benchmarks/figures/`. The pymoo/pycma baselines for the
+three §8 example problems ship in `benchmarks/baselines/`
+(see its README); only the broader ~30-problem benchmark catalog (the §8.1
+catalog) and its baseline sweep run from the authors' development workspace
+and are **not** bundled here. The §8 headline numbers are reproduced by the
+C++ worked examples (Step 3), the 21-seed sweep, the bundled baselines, and
 the validation runners above.
 
 ### Reproducing problems not shown in the paper
@@ -212,10 +218,13 @@ For convenience, every step above is wrapped in:
 This runs: (1) configure + build (fetching the pinned OpenNN), (2) the
 three C++ case studies (MOEED13 §8.3, photo_pce10 §8.4, concrete_uci_mo
 §8.5), (3) the BBOB analytical validation (§8.2) and the f15–f24 stress
-test (§7.3), and (4) the §8.4 Olympus real-data SO sweep. Re-running is
-safe: the build is incremental and each example overwrites its own
-`result.csv`. The broader multi-seed catalog sweep, the held-out
-cross-table, and figure generation are not part of this script.
+test (§7.3), (4) the §8.4 Olympus real-data SO sweep, (5) the
+photo_pce10 21-seed sweep + aggregation, (6) the surrogate-quality
+audit, and (7) the §8 MO figure regeneration. Re-running is safe: the
+build is incremental and each example overwrites its own `result.csv`.
+The broader multi-seed catalog sweep and the held-out cross-table (the
+full SO catalog and the pymoo/pycma baselines) are run from the authors'
+workspace and are not part of this script.
 
 ---
 

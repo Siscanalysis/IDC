@@ -9,7 +9,7 @@ the returned front is reduced to its non-dominated set and normalized per
 objective to [0,1] against the union of all three fronts (1 = best), matching
 the normalized-HV convention. It then reports:
   h   internal gap   = max_i min_{j!=i} ||o_i - o_j|| / sqrt(k)   (largest hole)
-  b   boundary gap   = (1/k) sum_j |1 - max_i o_{i,j}|           (reach shortfall)
+  b   boundary gap   = (1/k) sum_j |1 - max_i o_{i,j}| / sqrt(k)  (reach shortfall)
   SP  Schott spacing = std of nearest-neighbour Manhattan distances (x1e-3)
   Dl  Deb spread     = (df+dl+sum|d_i-dbar|)/(df+dl+(N-1)dbar),
                        df,dl = distance of the front extremes to the ideal
@@ -66,7 +66,9 @@ def _hgap(Q):
 
 
 def _bgap(Q):
-    return 0.5 * sum(abs(1 - Q[:, j].max()) for j in range(2))
+    k = Q.shape[1]
+    # matches OpenNN calculate_quality_metrics: (1/k) sum_j |1-max_j|, then /sqrt(k)
+    return (sum(abs(1 - Q[:, j].max()) for j in range(k)) / k) / np.sqrt(k)
 
 
 def _schott(Q):

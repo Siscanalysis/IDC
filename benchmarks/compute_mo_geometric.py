@@ -72,10 +72,14 @@ def _bgap(Q):
 
 
 def _schott(Q):
+    # Schott (1995) spacing: Manhattan nearest-neighbour distances, population
+    # std (divide by P, not P-1) -- reproduces the OpenNN/paper convention.
     P = len(Q)
+    if P < 2:
+        return 0.0
     d = cKDTree(Q).query(Q, k=2, p=1)[0][:, 1]
     db = d.mean()
-    return float(np.sqrt(((db - d) ** 2).sum() / (P - 1))) * 1000 if P > 1 else 0.0
+    return float(np.sqrt(((db - d) ** 2).sum() / P)) * 1000
 
 
 def _deb(Q):

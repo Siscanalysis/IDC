@@ -180,8 +180,10 @@ The "too small for a 5% removal" concern is not merely asserted: we
 attempted the top-5% holdout on the 425-row slice anyway, and the
 surrogate collapses into the hallucination regime — IDC's returned
 strengths rise to 118–134 MPa with 100% of points above the 81.75 MPa
-ceiling on all five seeds, against 77.6 MPa / 0 above-ceiling for the
-full-data age-28 surrogate. See
+ceiling on all five seeds, against 0 above-ceiling for the full-data
+age-28 surrogate (deployment-budget max 67.3 MPa, the §7.5 figure; the
+lower-budget 40k diagnostic max is 77.6 MPa, both well inside the
+envelope). See
 [`../experiments/concrete_age28/holdout_too_small.md`](../experiments/concrete_age28/holdout_too_small.md)
 for the numbers and a one-command reproduction. Note also that the
 holdout's value/space-gap attribution is built around a single argmax and

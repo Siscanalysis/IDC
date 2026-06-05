@@ -247,12 +247,24 @@ validate a fresh run against it:
 python scripts/compare_outputs.py examples/<name>/
 ```
 
-This compares the freshly produced `result.csv` against
-`expected_output.csv` element-wise with a tolerance of 1e-5 on inputs
-and 1e-3 on outputs, reporting any expected row that has no match. When no
+This compares the reproducible quantities of a fresh `result.csv` against
+`expected_output.csv` within a relative tolerance (5%): for single-objective
+examples the returned best objective value, and for multi-objective examples
+the per-objective extent (min/max) of the Pareto front. When no
 `expected_output.csv` is present the script skips with a notice (nothing
 to compare against). To create a reference, save a trusted run's
 `result.csv` as `expected_output.csv` in the example folder.
+
+> **Cross-compiler reproducibility caveat.** IDC is stochastic, and OpenNN's
+> uniform sampling and randomized affine-repair sweep draw from `std::`
+> distributions whose bit-stream is not portable across C++ standard libraries.
+> A clean clone built with a *different* compiler than the authors' therefore
+> reproduces the **objective value and the Pareto-front extent / hypervolume**
+> (the quantities reported in the paper), but generally lands on a **different
+> feasible argmin** (different input coordinates) of essentially equal quality.
+> `compare_outputs.py` accordingly asserts the objective quantities and only
+> *reports* the input vector; byte-identical argmin reproduction requires
+> building with the authors' toolchain.
 
 If you used the default `OPENNN_TAG` and the same compiler family,
 the outputs should match exactly; minor floating-point drift across

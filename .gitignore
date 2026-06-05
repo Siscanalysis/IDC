@@ -63,3 +63,5 @@ examples/**/output/
 experiments/**/results/
 experiments/**/*.csv
 experiments/**/*.log
+# Keep the small committed evidence summary backing the §7.5 holdout-collapse claim.
+!experiments/concrete_age28/holdout_evidence.csv

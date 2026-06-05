@@ -9,6 +9,14 @@ emulator-backed real datasets, and IDC was run across a catalog of them
 during development; this driver exposes a `--task` switch so any of the
 catalog tasks can be run. The default is the one shown in the paper.
 
+NOTE (reproducibility): this catalog runner delegates to a shared
+`olympus_runner` harness that lives in the authors' workspace and is NOT
+bundled here, and it requires the `olympus` package. It is provided for the
+broader catalog only and does not run from a clean clone. The paper's §7.4
+`photo_pce10` headline is reproduced from a clean clone by the C++ example
+(`examples/photo_pce10`) plus `benchmarks/baselines/run_baselines.py` and
+`run_extra_baselines.py`, which need neither olympus nor the harness.
+
 The Olympus tasks reachable here (the catalog subset used by the authors):
 
     photo_pce10     OPV blend, minimize photo-degradation  (§7.4, default)

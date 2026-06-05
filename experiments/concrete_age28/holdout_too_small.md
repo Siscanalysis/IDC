@@ -52,6 +52,13 @@ Both budgets agree on the qualitative finding that motivates §7.5: the full-dat
 age-28 surrogate stays under the ceiling, while every holdout seed collapses
 past it.
 
+These per-surrogate figures (IDC max predicted strength and the count of
+returned points above the 81.75 MPa ceiling) are committed in
+[`holdout_evidence.csv`](holdout_evidence.csv), so the numbers above are
+verifiable from a clean clone; the full per-point fronts (~27 MB) are
+gitignored and regenerable via `run_age28_chain.py` (author workspace; see
+below).
+
 Removing the top 5% by strength from a 425-row slice strips the high-strength
 anchor out of an already-small training set. Because the MO objective
 *maximises* strength, the surrogate is then left with no information near the

@@ -1,0 +1,7 @@
+surrogate,idc_max_strength_MPa,idc_points_above_81.75_ceiling,idc_total_points,pct_above_ceiling
+full-data (deployed §7.5 target),77.58,0,100245,0.0
+top-5% holdout seed 0,118.57,15813,15813,100.0
+top-5% holdout seed 1,129.54,1551,1551,100.0
+top-5% holdout seed 2,133.5,11377,11377,100.0
+top-5% holdout seed 3,127.79,35817,35817,100.0
+top-5% holdout seed 4,132.84,92827,92827,100.0

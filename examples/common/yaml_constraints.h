@@ -7,7 +7,7 @@
 //   - linear_inequality   (with `coefficients` + `lower`/`upper`)
 //   - nonlinear_inequality (with `expression`, pymoo convention g(x) <= 0)
 //
-// The YAML schema this parses is the narrow one used by IDC_benchmark/problems/:
+// The YAML schema this parses is the narrow one:
 //
 //   constraints:
 //     - name: ...

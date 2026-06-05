@@ -49,5 +49,5 @@ authors' workspace.
 ## Scope
 
 This covers the three §7 example problems. The broader ~30-problem catalog
-baseline comparison still runs from the authors' workspace
-(`experiments/IDC_benchmark/`), as noted in the top-level README.
+baseline comparison still runs from the authors' workspace,
+as noted in the top-level README.

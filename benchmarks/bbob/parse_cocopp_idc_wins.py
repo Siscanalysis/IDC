@@ -1,8 +1,7 @@
 """
 parse_cocopp_idc_wins.py
 
-Walk the five BBOB/COCO suites under
-  C:\\Users\\Artelnics\\Desktop\\experiments\\IDC_benchmark\\ppdata\\
+Walk the five BBOB/COCO suites,
 read each pptables_f<NN>_<D>D.tex per (function, dimension) cell, and emit:
 
   results/per_function_idc_wins.csv   ← (suite, fn, dim, idc_ratio, idc_wins_count, total_targets, baselines_bold)
@@ -21,12 +20,17 @@ We count, per (function, dim), how many of the target-precision columns IDC has 
 """
 from __future__ import annotations
 
+import os
 import re
 import csv
 from pathlib import Path
 from collections import defaultdict
 
-PPDATA = Path(r"C:\Users\Artelnics\Desktop\experiments\IDC_benchmark\ppdata")
+# Raw cocopp post-processing output (per-function pptables_*.tex). Author-workspace
+# only: the PARSED result (results/summary_idc_wins.csv etc., committed) is the
+# reproducible §7.2/§7.6 artifact; set BBOB_PPDATA only to re-parse from scratch.
+PPDATA = Path(os.environ.get("BBOB_PPDATA", "ppdata"))
+
 OUT = Path(__file__).parent / "results"
 OUT.mkdir(parents=True, exist_ok=True)
 

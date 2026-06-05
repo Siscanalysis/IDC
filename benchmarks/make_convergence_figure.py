@@ -9,10 +9,7 @@ and the pymoo single-objective baselines, on the top-5% holdout
 surrogates. This is the figure addressing the reviewer's request for a
 convergence plot.
 
-The trace is produced upstream by
-`experiments/IDC_benchmark/.../gen_photo_convergence.py`, which runs IDC
-and the baselines against the same capped holdout surrogates used in the
-§7.4 table and logs the running best-feasible objective. This script only
+This script only
 renders the committed CSV, so the figure regenerates with no heavy
 dependencies (just matplotlib + numpy).
 

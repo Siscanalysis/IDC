@@ -3,7 +3,6 @@ compare_age28_vs_full.py — side-by-side aggregator for the age28
 companion experiment vs the parent (age-mixed) §7.5 result.
 
 Reads from this folder's results/ subdir (age28 chain outputs) and
-the canonical IDC_benchmark/results/branch_a/ holdout outputs for
 the parent comparison. Reports:
 
   - per-surrogate IDC strength_max and pymoo strength_max
@@ -13,6 +12,7 @@ the parent comparison. Reports:
 """
 from __future__ import annotations
 from pathlib import Path
+import os
 import sys
 
 import numpy as np
@@ -20,10 +20,13 @@ import pandas as pd
 
 HERE = Path(__file__).parent
 RESULTS_AGE28 = HERE / "results"
-RESULTS_PARENT = Path(r"C:\Users\Artelnics\Desktop\experiments\IDC_benchmark\results\branch_a")
+# Author-workspace only. The committed results/*.csv (age28 chain outputs) back the
+# numbers in holdout_too_small.md; set IDC_BENCHMARK_BRANCH_A only to re-aggregate
+# against the parent (age-mixed) holdout outputs from the authors' workspace.
+RESULTS_PARENT = Path(os.environ.get("IDC_BENCHMARK_BRANCH_A", "results"))
 
-# Add the shared experiments dir for compute_concrete_mo_hv_feasible_only.py's HV func
-sys.path.insert(0, str(Path(r"C:\Users\Artelnics\Desktop\experiments\Papers\first_IDC_paper\afte_first_review\experiments")))
+# compute_concrete_mo_hv_feasible_only.py is bundled one level up (companion experiments/).
+sys.path.insert(0, str(HERE.parent))
 try:
     from compute_concrete_mo_hv_feasible_only import non_dominated_max_min
     from pymoo.indicators.hv import HV as PyMooHV

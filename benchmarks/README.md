@@ -33,8 +33,7 @@ benchmarks/
 > baselines for the three §7 example problems (photo_pce10, concrete_uci_mo,
 > moeed13) ship in [`baselines/`](baselines/) and run on the same surrogate +
 > YAML as the C++ IDC binaries. Only the broader ~30-problem benchmark catalog
-> (the §7.1 catalog) and its baseline sweep are run from the authors' workspace
-> (the catalog drivers live in `experiments/IDC_benchmark/`).
+> (the §7.1 catalog) and its baseline sweep are run from the authors' workspace.
 
 ## What maps to which §
 
@@ -123,7 +122,7 @@ figure-regeneration (`make_figures.py`), and the pymoo/pycma baselines for
 the three §7 example problems (`baselines/run_baselines.py`) all run today
 and reproduce the results shown explicitly in the paper. Only the broader
 ~30-problem benchmark catalog (the §7.1 catalog) and its baseline sweep are
-maintained in the authors' working tree (`experiments/IDC_benchmark/`);
+maintained in the authors' working tree;
 OpenNN is pinned to the immutable tag `v1.2-IDC-paper` for
 byte-reproducibility.
 

@@ -15,8 +15,10 @@ from __future__ import annotations
 import os, shutil, subprocess
 from pathlib import Path
 
-REPO  = Path(r"C:\Users\Artelnics\Desktop\experiments\IDC_benchmark")
-DATA  = Path(r"C:\Users\Artelnics\Desktop\benchmark_datasets")
+# Author-workspace only. Committed results/age28_*.csv are the reproducible
+# artifacts; set these env vars to re-run from scratch.
+REPO  = Path(os.environ.get("IDC_BENCHMARK", "path/to/IDC_benchmark"))
+DATA  = Path(os.environ.get("BENCHMARK_DATASETS", "path/to/benchmark_datasets"))
 HERE  = Path(__file__).parent
 OUT   = HERE / "results"
 OUT.mkdir(exist_ok=True)

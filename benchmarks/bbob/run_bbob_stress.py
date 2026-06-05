@@ -242,7 +242,31 @@ def run_idc(f, dim, seed, budget, lo, hi, gamma=0.45, n_iters=10):
     return best_f
 
 
-RUNNERS = {"IDC": run_idc, "CMA-ES": run_cma_es, "DE": run_de}
+def run_idc_multistart(f, dim, seed, budget, lo, hi, K=5, gamma=0.45, n_iters=10):
+    """K full-domain restarts at fixed TOTAL budget (B/K each), best-of-K.
+
+    A minimal *tested* mitigation for the local-minima trap discussed in
+    Section 6.3 of the paper: each restart re-samples the full [lo, hi]^dim
+    box from a fresh seed, so a contraction that trapped one restart in a
+    suboptimal basin does not bind the others. Total surrogate budget is held
+    equal to the single-run IDC (B/K evaluations per restart)."""
+    per = max(1, budget // K)
+    best = float("inf")
+    for k in range(K):
+        bf = run_idc(f, dim, seed * 1000 + k, per, lo, hi, gamma=gamma, n_iters=n_iters)
+        best = min(best, bf)
+    return best
+
+
+RUNNERS = {
+    "IDC": run_idc,
+    "IDC-MS5": lambda f, dim, seed, budget, lo, hi: run_idc_multistart(
+        f, dim, seed, budget, lo, hi, K=5),
+    "IDC-MS10": lambda f, dim, seed, budget, lo, hi: run_idc_multistart(
+        f, dim, seed, budget, lo, hi, K=10),
+    "CMA-ES": run_cma_es,
+    "DE": run_de,
+}
 
 
 # ---------- driver ---------------------------------------------------------

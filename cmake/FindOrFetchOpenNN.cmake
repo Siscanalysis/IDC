@@ -81,6 +81,21 @@ if(NOT TARGET Eigen3::Eigen)
 endif()
 
 # -----------------------------------------------------------------------------
+# OpenNN build options — CPU-only, tabular-only by default
+# -----------------------------------------------------------------------------
+# The worked examples are tabular and CPU-reproducible. Default OpenNN to a
+# CPU-only (no CUDA/cuDNN) and vision-free (no system ZLIB/JPEG) build so a
+# clean clone configures out of the box on a machine without a CUDA toolkit or
+# system image libraries. Override with -DOpenNN_DISABLE_CUDA=OFF (GPU build)
+# or -DOpenNN_BUILD_VISION=ON (pull in the vision stack).
+if(NOT DEFINED OpenNN_DISABLE_CUDA)
+    set(OpenNN_DISABLE_CUDA ON CACHE BOOL "Build OpenNN CPU-only for IDC reproduction")
+endif()
+if(NOT DEFINED OpenNN_BUILD_VISION)
+    set(OpenNN_BUILD_VISION OFF CACHE BOOL "Build OpenNN tabular-only for IDC reproduction")
+endif()
+
+# -----------------------------------------------------------------------------
 # Tier 1 — OPENNN_ROOT (local checkout)
 # -----------------------------------------------------------------------------
 if(NOT DEFINED OPENNN_ROOT AND DEFINED ENV{OPENNN_ROOT})

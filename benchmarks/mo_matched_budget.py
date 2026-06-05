@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-mo_matched_budget.py — authoritative regeneration of the §8.3 (MOEED13) and
-§8.5 (UCI Concrete) matched-budget multi-objective results, for BOTH constraint
+mo_matched_budget.py — authoritative regeneration of the §7.3 (MOEED13) and
+§7.5 (UCI Concrete) matched-budget multi-objective results, for BOTH constraint
 formulations (equality + tolerance band), from the committed example artifacts.
 
 For each example and formulation it reads the bundled IDC front and the bundled
@@ -11,8 +11,10 @@ cap, the baselines via pymoo's MaximumFunctionCallTermination(400000)), and
 reports, per algorithm:
 
   |PF|      number of returned Pareto points (IDC: archive; NSGA: final front)
-  normHV    union-normalized hypervolume (1 = best corner), same staircase
-            convention as the paper's normalized-HV figures
+  normHV    normalized hypervolume (1 = best corner) against a fixed
+            per-problem reference box (the single-seed full-data equality run;
+            the same box for every formulation), same staircase convention as
+            the paper's normalized-HV figures
   feas%     feasibility at the engineering tolerance (|Sum - target| <= 0.5),
             NOT the strict 1e-6 float tolerance (which spuriously fails IDC's
             float32 equality-projected points; see problem_pymoo.feasible)
@@ -130,14 +132,25 @@ def _dom_frac(A, B):
     return 100.0 * c / len(B)
 
 
-def _norm_and_hv(fronts):
-    allp = [p for F in fronts.values() for p in F]
-    amin, amax = min(p[0] for p in allp), max(p[0] for p in allp)
-    bmin, bmax = min(p[1] for p in allp), max(p[1] for p in allp)
+def _norm_and_hv(fronts, bounds=None):
+    # Reference box. When `bounds` is supplied, every formulation is scored
+    # against the SAME fixed corners (the single-seed full-data equality run
+    # defines them; see main()), so an algorithm's normalized HV does not drift
+    # between the equality/band/mixed comparisons and IDC's value is constant.
+    # With bounds=None the legacy per-call union reference is used.
+    if bounds is None:
+        allp = [p for F in fronts.values() for p in F]
+        amin, amax = min(p[0] for p in allp), max(p[0] for p in allp)
+        bmin, bmax = min(p[1] for p in allp), max(p[1] for p in allp)
+    else:
+        amin, amax, bmin, bmax = bounds
+
+    def _c(v):  # clip to the fixed reference box
+        return 0.0 if v < 0.0 else (1.0 if v > 1.0 else v)
 
     def norm(F):
-        return [((amax - a) / (amax - amin) if amax > amin else 1.0,
-                 (bmax - b) / (bmax - bmin) if bmax > bmin else 1.0) for a, b in F]
+        return [(_c((amax - a) / (amax - amin)) if amax > amin else 1.0,
+                 _c((bmax - b) / (bmax - bmin)) if bmax > bmin else 1.0) for a, b in F]
 
     def hv(Q):
         Qs = sorted(set(Q), key=lambda p: (p[0], -p[1]))
@@ -150,7 +163,7 @@ def _norm_and_hv(fronts):
             if y > last:
                 area += x * (y - last); last = y
         return area
-    return norm, hv
+    return norm, hv, (amin, amax, bmin, bmax)
 
 
 def _residual(S, target):
@@ -160,7 +173,7 @@ def _residual(S, target):
         (float(d.max()) if len(d) else float("nan"))
 
 
-def process(name, case, form):
+def process(name, case, form, fixed_bounds=None):
     # Comparison modes:
     #   "equality" — IDC + NSGA both under the equality (NSGA collapses).
     #   "band"     — IDC + NSGA both under the tolerance band.
@@ -184,7 +197,7 @@ def process(name, case, form):
     n2F, n2S = _nsga_FP(case, nsga_rows, "nsga2", case["nvars"])
     n3F, n3S = _nsga_FP(case, nsga_rows, "nsga3", case["nvars"])
     fronts = {"IDC": _nondom_min(idcF), "NSGA2": _nondom_min(n2F), "NSGA3": _nondom_min(n3F)}
-    norm, hv = _norm_and_hv(fronts)
+    norm, hv, used_bounds = _norm_and_hv(fronts, fixed_bounds)
     rows_out = []
     for algo, F, S in [("IDC", idcF, idcS), ("NSGA2", n2F, n2S), ("NSGA3", n3F, n3S)]:
         feas, rmean, rmax = _residual(S, case["target"])
@@ -203,7 +216,7 @@ def process(name, case, form):
             r["idc_dom_nsga3_pct"] = round(dom_n3, 1)
             r["idc_dominated_pct"] = round(idc_dominated, 2)
     _figure(name, case, form, fronts, norm, hv)
-    return rows_out
+    return rows_out, used_bounds
 
 
 def _figure(name, case, form, fronts, norm, hv):
@@ -241,8 +254,13 @@ def main():
     OUTCSV.parent.mkdir(parents=True, exist_ok=True)
     all_rows = []
     for name, case in CASES.items():
+        # Fixed reference box, computed ONCE from the equality formulation (the
+        # canonical single-seed full-data run) and reused for every formulation,
+        # so each algorithm is scored against the same corners and IDC's HV does
+        # not drift between the equality/band/mixed comparisons.
+        _, fixed_bounds = process(name, case, "equality")
         for form in ("equality", "band", "mixed"):
-            rows = process(name, case, form)
+            rows, _ = process(name, case, form, fixed_bounds=fixed_bounds)
             all_rows.extend(rows)
             print("=" * 78)
             print(f"{name}  —  {form.upper()}  (target Sum = {case['target']})")

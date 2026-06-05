@@ -10,7 +10,7 @@
 # collapse to a single point while IDC's affine repair projects onto it exactly.
 # Note: the concrete density constraint is genuinely a tolerance in practice;
 # the equality is a fixed-to-mean-density modeling choice, not a physical law
-# (contrast MOEED13's power-balance demand equality). See Section 8.5.
+# (contrast MOEED13's power-balance demand equality). See Section 7.5.
 
 problem:
   name: concrete_uci_mo
@@ -71,7 +71,7 @@ constraints:
     upper: 0.0
     notes: "fly_ash <= 0.40 * (cement + slag + fly_ash). ASTM C595 Type IP (Portland-pozzolan cement, general construction) modern revision — caps pozzolan replacement at 40%."
 
-# Matched-budget multi-objective study (Section 8.5): same 400000 total
+# Matched-budget multi-objective study (Section 7.5): same 400000 total
 # surrogate-evaluation budget as the equality formulation and the baselines.
 budget:
   total_nn_evaluations: 400000

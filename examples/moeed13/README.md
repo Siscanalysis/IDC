@@ -1,4 +1,4 @@
-# §8.3 — Validation (simulator-grounded MO): MOEED13 economic-emission dispatch
+# §7.3 — Validation (simulator-grounded MO): MOEED13 economic-emission dispatch
 
 **Buildable C++ example.** `main.cpp` loads the 2-output simulator
 surrogate (`nn/moeed13.json`), applies the per-unit bounds and the
@@ -6,7 +6,7 @@ power-balance constraint, runs multi-objective IDC (min cost, min
 emission), and writes the Pareto front to `result.csv`. Built via the
 top-level CMake (target `moeed13`).
 
-**Two constraint formulations** are shipped (see §8.3):
+**Two constraint formulations** are shipped (see §7.3):
 
 | run | constraint | files |
 |-----|-----------|-------|
@@ -29,7 +29,7 @@ pass (`set_initial_sampling_factor(10)`).
 
 This is the **validation** counterpart to the analytical
 `bbob-biobj-mixint` sweep ([`../../benchmarks/bbob/`](../../benchmarks/bbob/)).
-Where photo_pce10 (§8.4) and concrete_uci_mo (§8.5) expose IDC to a
+Where photo_pce10 (§7.4) and concrete_uci_mo (§7.5) expose IDC to a
 surrogate fitted on *measurement* data, MOEED13 is **simulator-grounded**:
 the objective surface is a known closed-form simulator, so the surrogate
 fit can be checked directly against ground truth and there is no
@@ -82,7 +82,7 @@ cost/emission simulator, and a 2-output OpenNN feed-forward network is
 fitted by the Growing Neurons selector. Reported surrogate fit:
 $R^2 = 0.9934$ (cost, RMSE ≈ 179 \$/h), $R^2 = 0.9997$ (emission,
 RMSE ≈ 14 lb/h). Trained model JSON at `nn/moeed13.json`.
-Budget: the §8.3 matched-budget MO study holds IDC and the NSGA-II/III
+Budget: the §7.3 matched-budget MO study holds IDC and the NSGA-II/III
 baselines to the **same 400,000 total surrogate-evaluation budget**. IDC uses
 per-point sampling $N=200$ with the total hard-capped by
 `set_max_total_evaluations(400000)` (so its per-Pareto-point sampling no longer
@@ -100,7 +100,7 @@ reproducible. Coefficient provenance and citations are in
 
 Because the simulator is closed-form, the example also re-scores the
 IDC / pymoo Pareto fronts against ground truth — that comparison
-(Figure in §8.3) is produced by the simulator-truth script in
+(Figure in §7.3) is produced by the simulator-truth script in
 `benchmarks/`.
 
 ## Why this is in the validation block, not the real-applications block
@@ -116,7 +116,7 @@ simulator truth, not under the memorization-suppression holdout.
 
 `result.csv` contains the Pareto front as
 $(P_0, \ldots, P_{12}, \hat{C}, \hat{E})$ rows. Headline HV vs NSGA-II /
-NSGA-III is reported in the §8.3 table.
+NSGA-III is reported in the §7.3 table.
 
 To reproduce:
 

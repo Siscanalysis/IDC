@@ -1,4 +1,4 @@
-// Worked example — IDC on the Olympus photo_pce10 OPV task (paper Section 8.4).
+// Worked example — IDC on the Olympus photo_pce10 OPV task (paper Section 7.4).
 //
 // Loads the trained OpenNN surrogate (4 mass fractions -> photo-degradation),
 // declares the simplex + donor-band constraints from problem.yaml, runs
@@ -81,7 +81,7 @@ int main(int argc, char** argv)
         // Simplex equality + donor band (1/6 <= mat_1+mat_2 <= 5/6) from the YAML.
         opennn_idc::apply_yaml_constraints(opt, yaml_path);
 
-        // Paper-default IDC configuration (Section 8.1).
+        // Paper-default IDC configuration (Section 7.1).
         opt.set_evaluations_number(2000);   // N candidates per iteration
         opt.set_iterations(20);             // I_max
         opt.set_zoom_factor(0.85f);         // gamma

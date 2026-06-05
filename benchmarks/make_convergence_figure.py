@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Plot the photo_pce10 convergence-vs-budget figure (manuscript §8.4).
+Plot the photo_pce10 convergence-vs-budget figure (manuscript §7.4).
 
 Reads the committed convergence trace
 (`extra_results/photo_pce10_convergence.csv`) and renders best feasible
@@ -12,7 +12,7 @@ convergence plot.
 The trace is produced upstream by
 `experiments/IDC_benchmark/.../gen_photo_convergence.py`, which runs IDC
 and the baselines against the same capped holdout surrogates used in the
-§8.4 table and logs the running best-feasible objective. This script only
+§7.4 table and logs the running best-feasible objective. This script only
 renders the committed CSV, so the figure regenerates with no heavy
 dependencies (just matplotlib + numpy).
 

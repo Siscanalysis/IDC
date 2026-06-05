@@ -1,6 +1,6 @@
 # SOURCE — BBOB / COCO analytical functions
 
-Used by §8.2 (`benchmarks/bbob/`, the analytical validation) and §7.3
+Used by §7.2 (`benchmarks/bbob/`, the analytical validation) and §6.3
 (the f15–f24 hard-multimodal stress test).
 
 ## No dataset

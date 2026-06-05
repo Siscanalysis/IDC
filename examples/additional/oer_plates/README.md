@@ -2,7 +2,7 @@
 
 **Not a manuscript example.** This OER-catalyst screen was a headline
 example in an earlier draft; the final manuscript carries the simplex /
-affine-repair story through the §8.4 photo_pce10 case study and the §8.2
+affine-repair story through the §7.4 photo_pce10 case study and the §7.2
 BBOB bi-objective mixed-integer validation instead. It is kept here as an
 extra affine-repair showcase on a strict 6-simplex equality constraint,
 part of the broader chemistry-HTE catalog.

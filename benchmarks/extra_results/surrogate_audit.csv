@@ -1,7 +1,7 @@
 entry,section,type,surrogate_target,test_r2,status,note
-bbob-biobj-mixint,8.2,analytical,(none),,reported,Analytical COCO functions; evaluated exactly, no surrogate.
-moeed13,8.3,simulator,cost,0.9934,reported,Closed-form Walters-Sheble cost fitted noise-free.
-moeed13,8.3,simulator,emission,0.9997,reported,Closed-form Abido emission fitted noise-free.
-photo_pce10,8.4,real,degradation,0.90,reported,Top-5% held-out test R^2.
-concrete_uci_mo,8.5,real,strength,0.79,reported,Age-28 slice (425 rows); calibrated against the measured data ceiling (81.75 MPa) rather than the held-out protocol.
+bbob-biobj-mixint,7.2,analytical,(none),,reported,Analytical COCO functions; evaluated exactly, no surrogate.
+moeed13,7.3,simulator,cost,0.9934,reported,Closed-form Walters-Sheble cost fitted noise-free.
+moeed13,7.3,simulator,emission,0.9997,reported,Closed-form Abido emission fitted noise-free.
+photo_pce10,7.4,real,degradation,0.90,reported,Top-5% held-out test R^2.
+concrete_uci_mo,7.5,real,strength,0.79,reported,Age-28 slice (425 rows); calibrated against the measured data ceiling (81.75 MPa) rather than the held-out protocol.
 jacobsson2021_perovskite,-,real,stability,0.07,discarded,Strong-looking Pareto front but near-zero held-out fit; result discarded, not reported.

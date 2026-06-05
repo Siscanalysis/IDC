@@ -7,7 +7,7 @@
 # can sample it, and IDC's affine repair still projects onto the band. Under the
 # equality (../problem.yaml) the feasible set is a measure-zero hyperplane the
 # population baselines cannot sample, so they collapse to a single point while
-# IDC projects onto it exactly. See Section 8.3.
+# IDC projects onto it exactly. See Section 7.3.
 
 problem:
   name: moeed13
@@ -63,7 +63,7 @@ known_pareto_front:
   type: empirical_reference
   source: "Built by running NSGA-II directly on the analytical cost+emission with a high budget; the resulting non-dominated set is used as the reference Pareto set for IDC and surrogate-based runs."
 
-# Matched-budget multi-objective study (Section 8.3): same 400000 total
+# Matched-budget multi-objective study (Section 7.3): same 400000 total
 # surrogate-evaluation budget as the equality formulation and the baselines.
 budget:
   total_nn_evaluations: 400000

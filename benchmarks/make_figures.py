@@ -1,19 +1,19 @@
 #!/usr/bin/env python3
 """
-make_figures.py — render this companion's §8 multi-objective illustration
+make_figures.py — render this companion's §7 multi-objective illustration
 figures from the committed result CSVs.
 
-Scope: these are the IDC-only views reproducible from the bundled artifacts —
-the concrete (§8.5) and MOEED13 (§8.3) IDC Pareto fronts (each from its
-example's expected_output.csv) plus a catalog-wide mean-HV bar chart. The
-paper's full multi-algorithm figures (the IDC-vs-NSGA-II/III overlays and the
-normalized-hypervolume panels) are produced from the authors' workspace, since
-the pymoo baselines are not bundled here.
+Scope: views reproducible from the bundled artifacts — the concrete and MOEED13
+front-vs-front overlays (IDC's dense equality front from each example's
+expected_output.csv, against the band-relaxed NSGA-II/III fronts bundled in
+examples/<case>/band/<prefix>pymoo_fronts.csv) plus a catalog-wide mean-HV bar
+chart. The normalized-hypervolume panel figures are produced by
+mo_matched_budget.py (which reads the same bundled band fronts).
 
 Self-contained: reads only files shipped in this repository
 (`examples/<case>/expected_output.csv` and `benchmarks/extra_results/*.csv`),
 so it runs from a clean clone with just numpy + pandas + matplotlib — no sweep
-or build step required. The §8.4 photo_pce10 convergence figure is rendered
+or build step required. The §7.4 photo_pce10 convergence figure is rendered
 separately by `make_convergence_figure.py`.
 
 Outputs PDF + PNG into `benchmarks/figures/`.
@@ -46,38 +46,80 @@ def _save(fig, name: str) -> None:
     print(f"[fig] {name}.pdf / .png")
 
 
+# Print-friendly grayscale markers for the front-vs-front overlays: IDC's dense
+# equality front as small filled dots, the band-relaxed NSGA fronts as open
+# markers so they stay legible on top of the IDC cloud.
+_NSGA_STYLE = {
+    "nsga2": dict(marker="^", s=26, facecolor="none", edgecolor="0.0",
+                  linewidths=0.9, label_name="NSGA-II"),
+    "nsga3": dict(marker="s", s=30, facecolor="none", edgecolor="0.30",
+                  linewidths=0.9, label_name="NSGA-III"),
+}
+
+
+def _load_nsga_band(case_dir: str, prefix: str):
+    """Return the band-formulation NSGA fronts as a DataFrame (or None)."""
+    fronts = EXAMPLES / case_dir / "band" / f"{prefix}pymoo_fronts.csv"
+    if not fronts.exists():
+        print(f"[warn] {fronts} missing — overlay will show IDC only")
+        return None
+    return pd.read_csv(fronts)
+
+
 def pareto_concrete() -> None:
-    """§8.5 UCI Concrete MO Pareto front (strength vs cement)."""
+    """UCI Concrete MO front-vs-front: IDC equality vs NSGA band."""
     csv = EXAMPLES / "concrete_uci_mo" / "expected_output.csv"
     if not csv.exists():
         print(f"[skip] {csv} (run ./bin/concrete_uci_mo first)")
         return
     df = pd.read_csv(csv)
-    fig, ax = plt.subplots(figsize=(4.2, 3.2))
-    ax.scatter(df["cement"], df["strength"], s=4, color=palette(1)[0], alpha=0.55,
-               label=f"IDC front ({len(df)} pts)")
+    band = _load_nsga_band("concrete_uci_mo", "")
+    fig, ax = plt.subplots(figsize=(4.6, 3.4))
+    ax.scatter(df["cement"], df["strength"], s=4, color="0.55", alpha=0.55,
+               label=f"IDC front (eq., {len(df)} pts)", zorder=2)
+    if band is not None:
+        # pymoo stores F_0 = -strength (maximize negated), F_1 = cement.
+        for algo, st in _NSGA_STYLE.items():
+            rr = band[band["algorithm"] == algo]
+            if rr.empty:
+                continue
+            ax.scatter(rr["F_1"], -rr["F_0"], marker=st["marker"], s=st["s"],
+                       facecolor=st["facecolor"], edgecolor=st["edgecolor"],
+                       linewidths=st["linewidths"], zorder=3,
+                       label=f"{st['label_name']} (band, {len(rr)} pts)")
     ax.axhline(81.75, ls=":", color="0.4", lw=1.0, label="data ceiling 81.75 MPa")
     ax.set_xlabel(r"cement [kg/m$^3$]  (minimize)")
     ax.set_ylabel("predicted strength [MPa]  (maximize)")
-    ax.set_title("UCI Concrete MO — Pareto front (§8.5)")
-    ax.legend(loc="lower right")
+    ax.set_title("UCI Concrete MO — IDC equality vs NSGA band fronts")
+    ax.legend(loc="lower right", fontsize=7)
     _save(fig, "fig_pareto_concrete")
 
 
 def pareto_moeed13() -> None:
-    """§8.3 MOEED13 cost-emission Pareto front."""
+    """MOEED13 cost-emission front-vs-front: IDC equality vs NSGA band."""
     csv = EXAMPLES / "moeed13" / "expected_output.csv"
     if not csv.exists():
         print(f"[skip] {csv} (run ./bin/moeed13 first)")
         return
     df = pd.read_csv(csv)
-    fig, ax = plt.subplots(figsize=(4.2, 3.2))
-    ax.scatter(df["total_cost"], df["total_emission"], s=4, color=palette(1)[0],
-               alpha=0.55, label=f"IDC front ({len(df)} pts)")
+    band = _load_nsga_band("moeed13", "moeed13_")
+    fig, ax = plt.subplots(figsize=(4.6, 3.4))
+    ax.scatter(df["total_cost"], df["total_emission"], s=4, color="0.55",
+               alpha=0.55, label=f"IDC front (eq., {len(df)} pts)", zorder=2)
+    if band is not None:
+        # pymoo stores F_0 = total_cost, F_1 = total_emission (both minimized).
+        for algo, st in _NSGA_STYLE.items():
+            rr = band[band["algorithm"] == algo]
+            if rr.empty:
+                continue
+            ax.scatter(rr["F_0"], rr["F_1"], marker=st["marker"], s=st["s"],
+                       facecolor=st["facecolor"], edgecolor=st["edgecolor"],
+                       linewidths=st["linewidths"], zorder=3,
+                       label=f"{st['label_name']} (band, {len(rr)} pts)")
     ax.set_xlabel(r"total cost [\$/h]  (minimize)")
     ax.set_ylabel("total emission [lb/h]  (minimize)")
-    ax.set_title("MOEED13 — cost/emission Pareto front (§8.3)")
-    ax.legend(loc="upper right")
+    ax.set_title("MOEED13 — IDC equality vs NSGA band fronts")
+    ax.legend(loc="upper right", fontsize=7)
     _save(fig, "fig_pareto_moeed13")
 
 
@@ -108,7 +150,7 @@ def main() -> int:
     pareto_moeed13()
     mo_catalog_hv()
     print(f"[OK] figures written to {OUT}")
-    print("Note: the §8.4 photo_pce10 convergence figure is rendered by "
+    print("Note: the §7.4 photo_pce10 convergence figure is rendered by "
           "make_convergence_figure.py.")
     return 0
 

@@ -1,4 +1,4 @@
-# §8.4 — photo_pce10 (real-application SO). Links OpenNN; the shared YAML
+# §7.4 — photo_pce10 (real-application SO). Links OpenNN; the shared YAML
 # constraint helper lives in examples/common/. EXAMPLE_DIR lets main.cpp find
 # its nn/ model and problem.yaml regardless of the build directory.
 add_executable(photo_pce10 main.cpp)

@@ -23,7 +23,7 @@ opennn/                                ← Artelnics/opennn on GitHub
 └── …
 
 IDC_paper_companion/                   ← this repository
-├── examples/                          ← worked examples (§8)
+├── examples/                          ← worked examples (§7)
 ├── benchmarks/                        ← 21-seed sweep
 └── …
 ```
@@ -118,7 +118,7 @@ not redistributed here). Each example folder either:
 - includes a download script (`fetch_data.sh`) that pulls from the
   upstream source (Olympus tasks, larger datasets).
 
-The §8.2 BBOB analytical validation needs no dataset — it is evaluated
+The §7.2 BBOB analytical validation needs no dataset — it is evaluated
 directly from the COCO / canonical analytical functions in
 `benchmarks/bbob/`.
 

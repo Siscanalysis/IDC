@@ -4,7 +4,7 @@ section: "catalog (not in manuscript)"
 description: >
   Single-objective view of the UCI Concrete dataset: maximize the
   NN-predicted 28-day compressive strength, subject to the same six
-  input-side affine constraints as the §8.5 multi-objective sibling
+  input-side affine constraints as the §7.5 multi-objective sibling
   (EN 206 / ASTM C595). Shares the surrogate and dataset with
   examples/concrete_uci_mo; this entry only drops the cement objective.
 official_benchmark: false
@@ -27,7 +27,7 @@ outputs:
     source: nn_prediction
 
 # Ordered most-reliable -> least-reliable; "data pass" audited against the 1030
-# Yeh-1998 rows (2026-06-02). Same six limits as the §8.5 MO sibling.
+# Yeh-1998 rows (2026-06-02). Same six limits as the §7.5 MO sibling.
 formula_constraints:
   - { name: mass_balance, expr: "cement + slag + fly_ash + water + sp + coarse_agg + fine_agg", shape: affine, scope: inputs, relation: "in", value: [2200, 2600], required: true,
       notes: "Total mix density ~ 2400 kg/m^3. Data pass 99.7%. Most reliable (physical identity)." }

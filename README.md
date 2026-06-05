@@ -4,18 +4,18 @@ This repository is the public companion to the paper
 **"Neural network response optimization via iterative domain contraction"**
 (Scala, Lopez, Assumpção, Dewil — under review at *Advances in Computational Science and Engineering* / AIMS).
 
-It contains the worked examples reported in §8 of the paper, the benchmark
+It contains the worked examples reported in §7 of the paper, the benchmark
 suite, the held-out validation protocol, and a reproduction recipe — all
 built on top of the open-source library
 [OpenNN](https://github.com/Artelnics/opennn).
 
-> **Status.** The C++ worked examples (§8.3–§8.5), the BBOB / Olympus
+> **Status.** The C++ worked examples (§7.3–§7.5), the BBOB / Olympus
 > validation runners, the `photo_pce10` 21-seed sweep + aggregation, the
 > surrogate-quality audit, the MO figure-regeneration, the pymoo/pycma
-> baselines for the three §8 example problems (`benchmarks/baselines/`),
+> baselines for the three §7 example problems (`benchmarks/baselines/`),
 > and the in-tree datasets are present and runnable. OpenNN is pinned to the
 > immutable tag `v1.2-IDC-paper` for byte-reproducibility. Only the broader
-> ~30-problem benchmark catalog the paper's §8.1 points to and its baseline
+> ~30-problem benchmark catalog the paper's §7.1 points to and its baseline
 > sweep are run from the authors' workspace.
 
 ---
@@ -42,12 +42,12 @@ cd IDC
 mkdir build && cd build
 cmake ..        # downloads + builds the pinned OpenNN release
 cmake --build . --config Release
-./bin/photo_pce10   # runs the §8.4 real-application SO case study
+./bin/photo_pce10   # runs the §7.4 real-application SO case study
 ```
 
 Expected output: a `result.csv` containing the IDC-recommended input
 configuration and corresponding surrogate output, matching the headline
-number in the §8.4 table of the paper.
+number in the §7.4 table of the paper.
 
 ---
 
@@ -58,16 +58,16 @@ number in the §8.4 table of the paper.
 ```
 
 This configures and builds (fetching the pinned OpenNN), runs the three
-C++ case studies (§8.3 MOEED13, §8.4 photo_pce10, §8.5 concrete_uci_mo),
-then runs the §8.2 BBOB validation, the §7.3 f15–f24 stress test, and the
-§8.4 Olympus real-data SO sweep. The three C++ examples finish in
+C++ case studies (§7.3 MOEED13, §7.4 photo_pce10, §7.5 concrete_uci_mo),
+then runs the §7.2 BBOB validation, the §6.3 f15–f24 stress test, and the
+§7.4 Olympus real-data SO sweep. The three C++ examples finish in
 seconds; the BBOB / Olympus runners take longer, dominated by the pymoo
 baselines (IDC itself is sub-second per seed). It then runs the
 photo_pce10 21-seed sweep + aggregation, renders the surrogate-quality
-audit, and regenerates the §8 MO figures from the committed result CSVs.
-The pymoo/pycma baselines for the three §8 example problems ship in
+audit, and regenerates the §7 MO figures from the committed result CSVs.
+The pymoo/pycma baselines for the three §7 example problems ship in
 `benchmarks/baselines/` and run on the same surrogate + YAML as the C++
-binaries. Only the broader ~30-problem benchmark catalog (the §8.1
+binaries. Only the broader ~30-problem benchmark catalog (the §7.1
 catalog) and its baseline sweep, plus the SO holdout cross-table, are run
 from the authors' workspace and are not bundled in this companion.
 
@@ -75,7 +75,7 @@ from the authors' workspace and are not bundled in this companion.
 
 ## Worked examples
 
-The paper's §8 reports four headline case studies, split into a
+The paper's §7 reports four headline case studies, split into a
 **validation** block and a **real-applications** block. The two C++
 neural-network case studies are under `examples/`; the analytical BBOB
 validation is driven from `benchmarks/bbob/`:
@@ -87,7 +87,7 @@ validation is driven from `benchmarks/bbob/`:
 | 8.4 | photo_pce10 (Olympus OPV)        | Real application | Real SO        | [`examples/photo_pce10/`](examples/photo_pce10/) |
 | 8.5 | concrete_uci_mo (UCI Concrete)   | Real application | Real MO        | [`examples/concrete_uci_mo/`](examples/concrete_uci_mo/) |
 
-The broader catalog (~30 additional benchmark problems §8.1 refers to —
+The broader catalog (~30 additional benchmark problems §7.1 refers to —
 other BBOB suites, other Olympus tasks, classical engineering, chemistry
 HTE) is reproduced from [`benchmarks/`](benchmarks/), plus two extra
 real-data examples under
@@ -106,12 +106,12 @@ paper:
 - `bbob/run_bbob_suites.py` — COCO suite driver; `--suite` selects the
   suite (default `bbob-biobj-mixint`, the only one shown explicitly)
 - `bbob/run_bbob_stress.py` — the f15–f24 hard-multimodal stress test
-  (§7.3 limitations)
+  (§6.3 limitations)
 - `baselines/run_baselines.py` — pymoo/pycma baselines (CMA-ES/DE/GA/PSO,
-  NSGA-II/III/MOEA-D) for the three §8 example problems, on the same
+  NSGA-II/III/MOEA-D) for the three §7 example problems, on the same
   surrogate + YAML as the C++ IDC binaries; emits feasibility and the mean
   constraint-violation magnitude (see [`benchmarks/baselines/`](benchmarks/baselines/))
-- `make_convergence_figure.py` — regenerates the §8.4 convergence figure
+- `make_convergence_figure.py` — regenerates the §7.4 convergence figure
   from the committed `extra_results/` CSVs
 - `requirements.txt` — Python dependencies for the runners
 
@@ -130,8 +130,8 @@ IDC/
 ├── CMakeLists.txt               ← C++ build entry point
 ├── cmake/
 │   └── FindOrFetchOpenNN.cmake  ← three-tier OpenNN resolution
-├── examples/                    ← C++ NN case studies (§8.3–§8.5) + additional/
-├── benchmarks/                  ← BBOB (§8.2) + catalog sweep + figures + switches
+├── examples/                    ← C++ NN case studies (§7.3–§7.5) + additional/
+├── benchmarks/                  ← BBOB (§7.2) + catalog sweep + figures + switches
 ├── scripts/                     ← reproduction orchestrators
 ├── data/                        ← curated dataset subset
 └── docs/

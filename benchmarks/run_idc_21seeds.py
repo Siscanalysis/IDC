@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 run_idc_21seeds.py — sweep the shipped single-objective worked example over the
-21 independent optimizer seeds of the paper's §8.4 protocol.
+21 independent optimizer seeds of the paper's §7.4 protocol.
 
 Runs the built `bin/<example>` with `--seed s` for s in 0..N-1, parses the
 machine-readable `SWEEP seed=.. best_f=.. walltime=..` line each binary prints,
@@ -9,7 +9,7 @@ and writes a per-seed CSV to `benchmarks/results/branch_a/<example>_idc.csv`.
 Aggregate the result with `aggregate_21seeds.py`.
 
 Only the single-objective real-application example (photo_pce10) ships as a C++
-driver here; the broader SO catalog that §8.1 points to is run from the authors'
+driver here; the broader SO catalog that §7.1 points to is run from the authors'
 workspace, and other Olympus tasks are reachable via `run_olympus.py --task`.
 
     python run_idc_21seeds.py            # photo_pce10, 21 seeds

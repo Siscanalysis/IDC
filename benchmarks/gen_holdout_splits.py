@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 gen_holdout_splits.py — generate the top-X% held-out train/test splits for the
-§8.4 memorization-suppression protocol (paper §8.1, docs/holdout_procedure.md).
+§7.4 memorization-suppression protocol (paper §7.1, docs/holdout_procedure.md).
 
 This ships the *way to generate* the holdout datasets rather than the
 materialized splits. For a single-objective real-data table it:

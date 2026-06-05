@@ -2,7 +2,7 @@
 
 **Not a manuscript example.** This is the single-objective view of the
 UCI Concrete dataset. The paper's headline UCI Concrete case study is the
-**multi-objective** reformulation in §8.5
+**multi-objective** reformulation in §7.5
 ([`../../concrete_uci_mo/`](../../concrete_uci_mo/)); the single-objective
 variant is kept here as part of the broader SO catalog (it is problem
 `concrete_uci` in the `benchmarks/` 21-seed sweep).
@@ -28,13 +28,13 @@ ingredient ratios.
 
 - Upstream: <https://archive.ics.uci.edu/dataset/165/concrete+compressive+strength>
 - In-tree copy: [`../../../data/concrete_uci/concrete_uci.csv`](../../../data/concrete_uci/concrete_uci.csv)
-  (shared with the §8.5 MO example).
+  (shared with the §7.5 MO example).
 - Attribution + citation: [`../../../data/concrete_uci/SOURCE.md`](../../../data/concrete_uci/SOURCE.md).
 - License: CC-BY 4.0
 
 ## Constraints
 
-The same six engineering constraints as the §8.5 MO sibling (single
+The same six engineering constraints as the §7.5 MO sibling (single
 objective here — maximize strength), defined in
 [`constraints.yaml`](constraints.yaml).
 

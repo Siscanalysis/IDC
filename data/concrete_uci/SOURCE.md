@@ -1,6 +1,6 @@
 # SOURCE — UCI Concrete Compressive Strength
 
-Used by §8.5 (`examples/concrete_uci_mo/`, the multi-objective case study)
+Used by §7.5 (`examples/concrete_uci_mo/`, the multi-objective case study)
 and by the catalog single-objective example
 (`examples/additional/concrete_uci_so/`).
 

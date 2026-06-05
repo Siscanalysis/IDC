@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-compute_holdout_gaps.py — value_gap / space_gap for the §8.4 held-out protocol
+compute_holdout_gaps.py — value_gap / space_gap for the §7.4 held-out protocol
 (docs/holdout_procedure.md), computed from a trained held-out surrogate run.
 
 Given the full dataset (for the global argmax y*_data / x_argmax), a held-out

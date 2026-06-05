@@ -7,7 +7,7 @@ read each pptables_f<NN>_<D>D.tex per (function, dimension) cell, and emit:
 
   results/per_function_idc_wins.csv   ← (suite, fn, dim, idc_ratio, idc_wins_count, total_targets, baselines_bold)
   results/summary_idc_wins.csv        ← per (suite, dim): wins, losses, ties
-  results/headline_idc_wins.csv       ← top-N functions where IDC wins (mention-worthy in §8.6)
+  results/headline_idc_wins.csv       ← top-N functions where IDC wins (mention-worthy in §7.6)
 
 Algorithm-row mapping per suite (verified from legend in ppfigs.tex):
   bbob, bbob-mixint, bbob-constrained:    A=cmaes, B=de, C=ga, D=pso, E=idc

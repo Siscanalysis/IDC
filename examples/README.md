@@ -1,12 +1,12 @@
 # Worked examples
 
-The paper's §8 numerical study is organized into a **validation** block
+The paper's §7 numerical study is organized into a **validation** block
 and a **real-applications** block. The runnable artifacts are split the
 same way: the two C++ neural-network case studies live here under
 `examples/`; the analytical BBOB validation lives under
 [`../benchmarks/bbob/`](../benchmarks/bbob/).
 
-## In-paper examples (§8)
+## In-paper examples (§7)
 
 | § | Example | Block | Type | Constraint | Location | Status |
 |---|---------|-------|------|------------|----------|--------|
@@ -15,10 +15,10 @@ same way: the two C++ neural-network case studies live here under
 | 8.4 | photo_pce10 (OPV) | Real application | Real SO | simplex equality (+ donor band) | [`photo_pce10/`](photo_pce10/) | buildable C++ |
 | 8.5 | concrete_uci_mo (UCI Concrete) | Real application | Real MO | 6 affine inequalities | [`concrete_uci_mo/`](concrete_uci_mo/) | buildable C++ |
 
-- **Validation block** (§8.2 BBOB, §8.3 MOEED13): the objective surface
+- **Validation block** (§7.2 BBOB, §7.3 MOEED13): the objective surface
   is exact (analytical functions or a closed-form simulator), so there is
   no surrogate quality to confound the optimizer comparison.
-- **Real-applications block** (§8.4 photo_pce10, §8.5 concrete_uci_mo):
+- **Real-applications block** (§7.4 photo_pce10, §7.5 concrete_uci_mo):
   IDC is exposed to a fitted neural-network surrogate. The SO case
   (photo_pce10) is reported under the top-5% held-out protocol; the MO
   case (concrete_uci_mo) instead uses an age-28 surrogate restriction,
@@ -29,7 +29,7 @@ same way: the two C++ neural-network case studies live here under
 ## Additional catalog examples (not in the manuscript)
 
 `additional/` holds examples that are part of the broader ~30-problem
-catalog §8.1 points to, but are not among the four headline §8 case
+catalog §7.1 points to, but are not among the four headline §7 case
 studies — see [`additional/README.md`](additional/README.md):
 
 | Folder | Type | Constraint |

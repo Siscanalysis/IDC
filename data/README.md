@@ -1,6 +1,6 @@
 # Datasets
 
-Curated subset of the benchmark datasets used by the §8 worked
+Curated subset of the benchmark datasets used by the §7 worked
 examples in [`../examples/`](../examples/). The two real-measurement
 datasets are small and permissively licensed, so they ship **in-tree** —
 you can open them directly without running any fetch step.
@@ -24,7 +24,7 @@ optimizer actually loads).
 
 Notes:
 
-- The §8.2 BBOB bi-objective mixed-integer validation needs **no
+- The §7.2 BBOB bi-objective mixed-integer validation needs **no
   dataset**: it is evaluated directly from the analytical COCO functions
   (see [`../benchmarks/bbob/`](../benchmarks/bbob/) and
   [`bbob/SOURCE.md`](bbob/SOURCE.md)).
@@ -39,7 +39,7 @@ Notes:
 The full benchmark dataset workspace used by the authors during
 development lives at `experiments/benchmark_datasets/` in the authors'
 working tree; this companion repository ships only the subset needed to
-reproduce the §8 examples.
+reproduce the §7 examples.
 
 ## Upstream attribution
 

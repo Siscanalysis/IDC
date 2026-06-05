@@ -1,4 +1,4 @@
-// Worked example — IDC on UCI Concrete, multi-objective (paper Section 8.5).
+// Worked example — IDC on UCI Concrete, multi-objective (paper Section 7.5).
 //
 // Loads the trained OpenNN strength surrogate (8 mix inputs -> 28-day
 // compressive strength), declares the six EN 206 / ASTM C595 affine
@@ -6,11 +6,11 @@
 // max strength vs min cement (cement is a passthrough on its input variable).
 // Writes result.csv with the recovered Pareto front.
 //
-// The paper's Section 8.5 trains the surrogate on the age-28 slice of the Yeh
+// The paper's Section 7.5 trains the surrogate on the age-28 slice of the Yeh
 // dataset; this worked example ships the Growing-Neurons surrogate and
 // demonstrates the MO pipeline.
 //
-// Two mass-balance formulations are shipped (paper Section 8.5):
+// Two mass-balance formulations are shipped (paper Section 7.5):
 //   * default (no argument): the EQUALITY formulation sum(ingredients) == mu,
 //     mu = 2325.012558 kg/m^3 (mean age-28 dataset density; a fixed-to-mean
 //     modeling choice, not a physical equality), read from
@@ -90,7 +90,7 @@ int main(int argc, char** argv)
         // Six EN 206 / ASTM C595 affine constraints from the YAML.
         opennn_idc::apply_yaml_constraints(opt, yaml_path);
 
-        // Matched-budget study (Section 8.3/8.5): same total surrogate-evaluation
+        // Matched-budget study (Section 7.3/8.5): same total surrogate-evaluation
         // budget as the pymoo baselines. Per-point sampling 2000 -> 200 so IDC
         // refines over more iterations within the budget; total hard-capped.
         opt.set_evaluations_number(200);

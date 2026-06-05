@@ -1,4 +1,4 @@
-# §8.4 — Real-application case study (SO): photo_pce10 (OPV, simplex constraint)
+# §7.4 — Real-application case study (SO): photo_pce10 (OPV, simplex constraint)
 
 **Buildable C++ example.** `main.cpp` loads the trained surrogate
 (`nn/photo_pce10.json`), applies the constraints in `problem.yaml`, runs
@@ -6,7 +6,7 @@ IDC, and writes `result.csv`. Built via the top-level CMake (target
 `photo_pce10`).
 
 This is one of the two **real-application** case studies in the paper
-(the other is concrete_uci_mo, §8.5). It is the single-objective
+(the other is concrete_uci_mo, §7.5). It is the single-objective
 simplex-constrained showcase: the donor:acceptor mass fractions sum to
 one, so IDC's affine repair operator (§4.4) projects every random sample
 back onto the simplex in a single algebraic pass. Reported under the
@@ -49,7 +49,7 @@ measured blends from the Langner et al. 2020 high-throughput campaign.
   (1040 rows, columns `mat_1,mat_2,mat_3,mat_4,degradation`).
 - Attribution + citations: [`../../data/photo_pce10/SOURCE.md`](../../data/photo_pce10/SOURCE.md).
 - License: MIT (Olympus).
-- Physical context: §8.4 of the paper covers the OPV device physics and
+- Physical context: §7.4 of the paper covers the OPV device physics and
   why the donor:acceptor morphology drives both efficiency and stability.
 
 ## Constraints
@@ -71,7 +71,7 @@ OpenNN Growing Neurons selection over the Olympus `photo_pce10` rows
 (`4 → hidden → 1`; test-set R² ≈ 0.90, full-data fit R² = 0.93,
 RMSE ≈ 0.028). Trained model JSON at `nn/photo_pce10.json`.
 Budget: 40,000 surrogate evaluations per seed, 21 independent seeds per
-algorithm (paper §8.1).
+algorithm (paper §7.1).
 
 ## Expected output
 
@@ -89,5 +89,5 @@ cmake --build . --target photo_pce10
 ./bin/photo_pce10
 ```
 
-Headline number reported in the §8.4 results table of the paper
+Headline number reported in the §7.4 results table of the paper
 (Photo-PCE10 held-out cross-validation).

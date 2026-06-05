@@ -1,7 +1,7 @@
 # Benchmark suite
 
-The analytical / catalog sweeps behind §8 of the paper, plus the
-switch-driven runners for the broader catalog of ~30 problems that §8.1
+The analytical / catalog sweeps behind §7 of the paper, plus the
+switch-driven runners for the broader catalog of ~30 problems that §7.1
 points to but does not show explicitly.
 
 ## Contents
@@ -11,15 +11,15 @@ benchmarks/
 ├── README.md                ← this file
 ├── requirements.txt         ← pip dependencies
 ├── run_olympus.py           ← Olympus real-data runner; --task switch (default photo_pce10)
-├── make_convergence_figure.py ← renders the §8.4 photo_pce10 convergence-vs-budget figure
-├── baselines/               ← pymoo/pycma baselines for the §8 examples (see its README)
+├── make_convergence_figure.py ← renders the §7.4 photo_pce10 convergence-vs-budget figure
+├── baselines/               ← pymoo/pycma baselines for the §7 examples (see its README)
 │   ├── problem_pymoo.py     ← shared YAML+NN problem (feasibility + max_violation)
 │   └── run_baselines.py     ← CMA-ES/DE/GA/PSO (SO) and NSGA-II/III/MOEA-D (MO)
-├── extra_results/           ← committed result snapshots beyond §8 (see its README)
+├── extra_results/           ← committed result snapshots beyond §7 (see its README)
 ├── bbob/
 │   ├── README.md            ← BBOB switch reference
-│   ├── run_bbob_suites.py   ← COCO suite driver; --suite switch (default bbob-biobj-mixint, §8.2)
-│   ├── run_bbob_stress.py   ← f15–f24 hard-multimodal stress test (§7.3), no COCO
+│   ├── run_bbob_suites.py   ← COCO suite driver; --suite switch (default bbob-biobj-mixint, §7.2)
+│   ├── run_bbob_stress.py   ← f15–f24 hard-multimodal stress test (§6.3), no COCO
 │   └── results/             ← output CSVs (gitignored)
 └── results/
     ├── branch_a/            ← per-problem CSVs from the catalog sweep (gitignored)
@@ -30,20 +30,20 @@ benchmarks/
 > sweep the single-objective `photo_pce10` example over 21 seeds;
 > `make_figures.py` and `audit_surrogates.py` also ship (figures from the
 > committed result CSVs, and the surrogate-quality R² audit). The pymoo/pycma
-> baselines for the three §8 example problems (photo_pce10, concrete_uci_mo,
+> baselines for the three §7 example problems (photo_pce10, concrete_uci_mo,
 > moeed13) ship in [`baselines/`](baselines/) and run on the same surrogate +
 > YAML as the C++ IDC binaries. Only the broader ~30-problem benchmark catalog
-> (the §8.1 catalog) and its baseline sweep are run from the authors' workspace
+> (the §7.1 catalog) and its baseline sweep are run from the authors' workspace
 > (the catalog drivers live in `experiments/IDC_benchmark/`).
 
 ## What maps to which §
 
 | Script | Paper § | Default behavior |
 |--------|---------|------------------|
-| `bbob/run_bbob_suites.py` | §8.2 analytical validation | runs `bbob-biobj-mixint` (the only suite shown) |
-| `bbob/run_bbob_stress.py` | §7.3 limitations | runs f15–f24 at *n*=5 and *n*=20 |
-| `run_olympus.py`          | §8.4 real-application SO | runs `photo_pce10` (the only task shown) |
-| `run_idc_21seeds.py`      | §8.1 catalog pointer | runs every catalog problem, 21 seeds |
+| `bbob/run_bbob_suites.py` | §7.2 analytical validation | runs `bbob-biobj-mixint` (the only suite shown) |
+| `bbob/run_bbob_stress.py` | §6.3 limitations | runs f15–f24 at *n*=5 and *n*=20 |
+| `run_olympus.py`          | §7.4 real-application SO | runs `photo_pce10` (the only task shown) |
+| `run_idc_21seeds.py`      | §7.1 catalog pointer | runs every catalog problem, 21 seeds |
 
 ## Switches for problems NOT shown in the paper
 
@@ -75,7 +75,7 @@ top-5% holdout over 15 problems, and the multi-objective HV table)
 live in [`extra_results/`](extra_results/) — these are the "additional
 reproducible tests" the manuscript points to.
 
-The §8.4 convergence figure is rendered from a committed trace:
+The §7.4 convergence figure is rendered from a committed trace:
 
 ```bash
 python make_convergence_figure.py     # -> fig_conv_photo_pce10.pdf
@@ -85,7 +85,7 @@ It reads `extra_results/photo_pce10_convergence.csv` (best feasible
 photo-degradation vs surrogate evaluations for IDC and the SO baselines
 on the five top-5% holdout surrogates) and needs only matplotlib + numpy.
 
-## Reproducing the §8.2 / catalog numbers
+## Reproducing the §7.2 / catalog numbers
 
 ```bash
 cd benchmarks
@@ -93,10 +93,10 @@ python -m venv .venv
 source .venv/bin/activate     # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
 
-python bbob/run_bbob_suites.py     # §8.2 analytical validation (default suite)
-python bbob/run_bbob_stress.py     # §7.3 f15–f24 stress test
-python run_olympus.py              # §8.4 photo_pce10 real-application SO
-python make_convergence_figure.py  # §8.4 convergence figure from extra_results/
+python bbob/run_bbob_suites.py     # §7.2 analytical validation (default suite)
+python bbob/run_bbob_stress.py     # §6.3 f15–f24 stress test
+python run_olympus.py              # §7.4 photo_pce10 real-application SO
+python make_convergence_figure.py  # §7.4 convergence figure from extra_results/
 ```
 
 Expected runtime on commodity hardware (i7 8-core): on the order of a
@@ -120,9 +120,9 @@ The bundled runners (`run_olympus.py`, `bbob/run_bbob_suites.py`,
 `photo_pce10` 21-seed sweep (`run_idc_21seeds.py` + `aggregate_21seeds.py`),
 the surrogate-quality audit (`audit_surrogates.py`), the MO
 figure-regeneration (`make_figures.py`), and the pymoo/pycma baselines for
-the three §8 example problems (`baselines/run_baselines.py`) all run today
+the three §7 example problems (`baselines/run_baselines.py`) all run today
 and reproduce the results shown explicitly in the paper. Only the broader
-~30-problem benchmark catalog (the §8.1 catalog) and its baseline sweep are
+~30-problem benchmark catalog (the §7.1 catalog) and its baseline sweep are
 maintained in the authors' working tree (`experiments/IDC_benchmark/`);
 OpenNN is pinned to the immutable tag `v1.2-IDC-paper` for
 byte-reproducibility.

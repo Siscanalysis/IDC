@@ -1,6 +1,6 @@
 # SOURCE — MOEED13 (13-unit economic-emission dispatch)
 
-Used by §8.3 (`examples/moeed13/`, the simulator-grounded MO validation).
+Used by §7.3 (`examples/moeed13/`, the simulator-grounded MO validation).
 
 ## Files
 

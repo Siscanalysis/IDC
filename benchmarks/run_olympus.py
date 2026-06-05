@@ -2,7 +2,7 @@
 """
 Olympus real-data runner with a task switch.
 
-The paper's §8.4 real-application case study uses the Olympus
+The paper's §7.4 real-application case study uses the Olympus
 `photo_pce10` task (organic-photovoltaic blend, simplex constraint). That
 is the only Olympus task shown explicitly. Olympus ships many more
 emulator-backed real datasets, and IDC was run across a catalog of them
@@ -11,7 +11,7 @@ catalog tasks can be run. The default is the one shown in the paper.
 
 The Olympus tasks reachable here (the catalog subset used by the authors):
 
-    photo_pce10     OPV blend, minimize photo-degradation  (§8.4, default)
+    photo_pce10     OPV blend, minimize photo-degradation  (§7.4, default)
     alkox           alkoxylation yield
     benzylation     N-benzylation yield
     crossed_barrel  mechanical toughness
@@ -19,7 +19,7 @@ The Olympus tasks reachable here (the catalog subset used by the authors):
     hplc            HPLC peak response
     snar            nucleophilic aromatic substitution
 
-Each task is run the same way as §8.4: a Growing-Neurons surrogate is
+Each task is run the same way as §7.4: a Growing-Neurons surrogate is
 trained on the task's rows, then IDC and the pymoo/pycma baselines are run
 against that *same* surrogate under the top-5% held-out protocol
 (docs/holdout_procedure.md). The actual optimization is delegated to the
@@ -28,7 +28,7 @@ owns task selection, surrogate training, seeds, and result aggregation.
 
 Examples
 --------
-    python run_olympus.py                        # §8.4 (photo_pce10)
+    python run_olympus.py                        # §7.4 (photo_pce10)
     python run_olympus.py --list-tasks
     python run_olympus.py --task snar            # a task NOT shown in the paper
     python run_olympus.py --task alkox --objective so --seeds 21
@@ -45,7 +45,7 @@ from pathlib import Path
 
 HERE = Path(__file__).parent
 
-# Olympus catalog subset. Only photo_pce10 is shown explicitly in §8.4;
+# Olympus catalog subset. Only photo_pce10 is shown explicitly in §7.4;
 # the rest are reachable via --task but reported only in this repo.
 TASKS = {
     "photo_pce10": "OPV blend, minimize photo-degradation (paper Sec 8.4, default).",
@@ -93,7 +93,7 @@ def parse_args(argv=None) -> argparse.Namespace:
         "--budget",
         type=int,
         default=40_000,
-        help="Surrogate evaluations per seed (default: 40000, the paper §8.4 budget). "
+        help="Surrogate evaluations per seed (default: 40000, the paper §7.4 budget). "
         "IDC defaults: N=2000 candidates/iter, gamma=0.85 zoom, I_max in 5..20, "
         "I_min=4, tau=1e-6 (see docs/reproducing.md).",
     )

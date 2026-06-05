@@ -1,6 +1,6 @@
 # SOURCE — Olympus `photo_pce10` (quaternary OPV photostability)
 
-Used by §8.4 (`examples/photo_pce10/`, the real-application SO case study).
+Used by §7.4 (`examples/photo_pce10/`, the real-application SO case study).
 
 ## Files
 

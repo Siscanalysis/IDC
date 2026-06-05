@@ -1,4 +1,4 @@
-# §8.3 — moeed13 (simulator-grounded MO validation). Links OpenNN; the shared
+# §7.3 — moeed13 (simulator-grounded MO validation). Links OpenNN; the shared
 # YAML constraint helper lives in examples/common/. EXAMPLE_DIR lets main.cpp
 # find its nn/ model and problem.yaml regardless of the build directory.
 add_executable(moeed13 main.cpp)

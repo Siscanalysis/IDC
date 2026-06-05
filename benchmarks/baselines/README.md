@@ -1,10 +1,10 @@
-# pymoo / pycma baselines for the §8 examples
+# pymoo / pycma baselines for the §7 examples
 
 This bundles the baseline optimizers the paper compares IDC against, run on the
 **same** trained surrogate and the **same** `problem.yaml` (bounds, objectives,
 constraints) the C++ IDC examples use. It makes the per-algorithm feasibility
-and constraint-violation comparison of the §8.4 (photo_pce10), §8.5
-(concrete_uci_mo), and §8.3 (moeed13) tables reproducible from a clean clone.
+and constraint-violation comparison of the §7.4 (photo_pce10), §7.5
+(concrete_uci_mo), and §7.3 (moeed13) tables reproducible from a clean clone.
 
 ## Files
 
@@ -37,8 +37,8 @@ produce `result.csv`.
 ```bash
 pip install -r ../requirements.txt          # pymoo, cma, numpy, pandas, pyyaml
 python run_baselines.py --example photo_pce10     --seeds 21 --budget 40000   # SO
-python run_baselines.py --example concrete_uci_mo --seed  42 --budget 40000   # MO
-python run_baselines.py --example moeed13         --seed  42 --budget 40000   # MO
+python run_baselines.py --example concrete_uci_mo --seed  42 --budget 400000  # MO
+python run_baselines.py --example moeed13         --seed  42 --budget 400000  # MO
 ```
 
 Output lands in `benchmarks/baselines/results/<ex>_baselines.csv` (and
@@ -48,6 +48,6 @@ authors' workspace.
 
 ## Scope
 
-This covers the three §8 example problems. The broader ~30-problem catalog
+This covers the three §7 example problems. The broader ~30-problem catalog
 baseline comparison still runs from the authors' workspace
 (`experiments/IDC_benchmark/`), as noted in the top-level README.

@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 """
-COCO/BBOB suite driver for the §8.2 analytical validation.
+COCO/BBOB suite driver for the §7.2 analytical validation.
 
 The paper reports IDC against NSGA-II / NSGA-III / MOEA/D on *every* COCO
 suite, but shows only the bi-objective mixed-integer suite explicitly
-(§8.2), because that is the analytical regime where IDC's combination of
+(§7.2), because that is the analytical regime where IDC's combination of
 categorical block elimination and affine repair translates into a
 decisive advantage. The other four suites are summarized qualitatively in
-§7.3 and reported in full only here in the companion repository.
+§6.3 and reported in full only here in the companion repository.
 
 This driver exposes a `--suite` switch so any of the five COCO suites can
 be run. The default is the one shown in the manuscript.
@@ -16,18 +16,18 @@ be run. The default is the one shown in the manuscript.
     bbob-mixint           single-objective mixed-integer
     bbob-constrained      single-objective constrained
     bbob-biobj            continuous bi-objective
-    bbob-biobj-mixint     bi-objective mixed-integer        (§8.2, default)
+    bbob-biobj-mixint     bi-objective mixed-integer        (§7.2, default)
 
 Suites are provided by the official COCO `cocoex` binding. cocoex is an
 optional dependency (it does not build on every Python version); when it
 is missing this script prints an actionable message instead of failing
-silently. For the hard-multimodal f15--f24 stress test reported in §7.3
+silently. For the hard-multimodal f15--f24 stress test reported in §6.3
 (which runs without COCO, on canonical analytical forms) use the sibling
 script `run_bbob_stress.py`.
 
 Examples
 --------
-    # §8.2 as shown in the paper (default suite)
+    # §7.2 as shown in the paper (default suite)
     python run_bbob_suites.py
 
     # a suite NOT shown explicitly in the manuscript
@@ -48,7 +48,7 @@ from pathlib import Path
 
 HERE = Path(__file__).parent
 
-# The five COCO suites. Only bbob-biobj-mixint is shown explicitly in §8.2;
+# The five COCO suites. Only bbob-biobj-mixint is shown explicitly in §7.2;
 # the others are reachable via --suite but are reported only in this repo.
 SUITES = {
     "bbob": "Continuous single-objective (24 noiseless functions).",
@@ -59,7 +59,7 @@ SUITES = {
 }
 DEFAULT_SUITE = "bbob-biobj-mixint"
 
-# Dimension cohort used in §8.2. COCO-default dimensions per suite differ;
+# Dimension cohort used in §7.2. COCO-default dimensions per suite differ;
 # pass --dimensions to override (the suite filters to those it supports).
 DEFAULT_DIMENSIONS = [5, 10, 20, 40, 80, 160]
 
@@ -83,7 +83,7 @@ def parse_args(argv=None) -> argparse.Namespace:
         "--suite",
         choices=sorted(SUITES),
         default=DEFAULT_SUITE,
-        help=f"COCO suite to run (default: {DEFAULT_SUITE}, the one shown in §8.2).",
+        help=f"COCO suite to run (default: {DEFAULT_SUITE}, the one shown in §7.2).",
     )
     p.add_argument(
         "--dimensions",

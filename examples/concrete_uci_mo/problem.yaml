@@ -10,7 +10,7 @@
 # MOEED13's power balance (a physical demand equality), the concrete density
 # equality is a MODELING CHOICE — "fix the mix to the mean dataset density" —
 # the real engineering constraint is a tolerance band (~2200-2600 kg/m^3).
-# The tolerance-band variant mu +/- 0.5 lives in band/problem.yaml. See §8.5.
+# The tolerance-band variant mu +/- 0.5 lives in band/problem.yaml. See §7.5.
 
 problem:
   name: concrete_uci_mo
@@ -134,13 +134,13 @@ formula_constraints:
     value: 0.0
     required: true
   # Note: an output-side strength cap (strength <= 100) was tried and removed.
-  # The holdout-surrogate methodology (§8 holdout protocol) is the right tool
+  # The holdout-surrogate methodology (§7 holdout protocol) is the right tool
   # to suppress surrogate-extrapolation hallucinations: training with the top
   # 5% strength rows held out prevents the surrogate from learning to predict
   # near-record values, and pymoo's extrapolation peak naturally disappears.
 
 budget:
-  # Matched-budget multi-objective study (Section 8.5): IDC and the NSGA-II/III
+  # Matched-budget multi-objective study (Section 7.5): IDC and the NSGA-II/III
   # baselines are held to the SAME 400000 total surrogate-evaluation budget.
   # IDC uses per-point sampling 200 with the total hard-capped via
   # set_max_total_evaluations(400000); it converges before the cap here (~377k

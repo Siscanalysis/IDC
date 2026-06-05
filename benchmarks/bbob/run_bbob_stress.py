@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """
-Hard-multimodal BBOB stress test (§7.3 limitations), run WITHOUT COCO.
+Hard-multimodal BBOB stress test (§6.3 limitations), run WITHOUT COCO.
 
-This is the f15--f24 hard-multimodal subset reported in §7.3 of the paper
+This is the f15--f24 hard-multimodal subset reported in §6.3 of the paper
 as the dimensionality stress test: IDC is competitive at n=5 but its
 relative performance degrades at n=20, quantifying the geometric coverage
 loss of uniform sampling in higher dimensions. It is a *non-surrogate*
@@ -30,7 +30,7 @@ Switches
 
 Examples
 --------
-    python run_bbob_stress.py                        # §7.3 as reported
+    python run_bbob_stress.py                        # §6.3 as reported
     python run_bbob_stress.py --functions 15 16 --dimensions 5
     python run_bbob_stress.py --dimensions 5 20 40   # extra dims, not in paper
 
@@ -80,7 +80,7 @@ def f17_schaffer_f7(x):
 
 def f18_schaffer_f7_illcond(x):
     # Same shape, but with ill-conditioned rescaling: x_i *= 10^(2*(i-1)/(n-1)).
-    # This is the SO building block of the §8.2 worked cell (Schaffer F7, cond 1e3).
+    # This is the SO building block of the §7.2 worked cell (Schaffer F7, cond 1e3).
     n = len(x)
     scales = 10 ** (2 * np.arange(n) / max(n - 1, 1))
     return f17_schaffer_f7(x * scales)
@@ -274,7 +274,7 @@ RUNNERS = {
 
 def parse_args(argv=None) -> argparse.Namespace:
     p = argparse.ArgumentParser(
-        description="f15--f24 hard-multimodal BBOB stress test (§7.3), no COCO.",
+        description="f15--f24 hard-multimodal BBOB stress test (§6.3), no COCO.",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog=__doc__,
     )
@@ -282,7 +282,7 @@ def parse_args(argv=None) -> argparse.Namespace:
                    choices=list(range(15, 25)),
                    help="BBOB function ids to run (default: 15..24).")
     p.add_argument("--dimensions", type=int, nargs="+", default=[5, 20],
-                   help="Dimensions to run (default: 5 20, the values in §7.3).")
+                   help="Dimensions to run (default: 5 20, the values in §6.3).")
     p.add_argument("--seeds", type=int, default=21,
                    help="Independent seeds per cell (default: 21).")
     p.add_argument("--algorithms", nargs="+", default=list(RUNNERS),

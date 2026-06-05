@@ -1,6 +1,6 @@
 """
 coco_runner.py — per-problem optimization backend for run_bbob_suites.py
-(§8.2 analytical validation on the COCO bbob-biobj-mixint suite).
+(§7.2 analytical validation on the COCO bbob-biobj-mixint suite).
 
 `run_problem(problem, algo, seed, multiobjective)` runs one optimizer on one
 COCO problem under a matched per-problem evaluation budget and returns a dict
@@ -10,7 +10,7 @@ empty here because the per-target ERT-win tally is computed downstream by
 
 Provenance and reproducibility scope
 -------------------------------------
-The §8.2 *headline* numbers in the manuscript (Table bbob-biobj-mixint, win
+The §7.2 *headline* numbers in the manuscript (Table bbob-biobj-mixint, win
 counts 63/59/70/85/90/91 of 92 across n_c = 5..160, cell-win rate
 67/57/70/91/98/100%) were produced in the authors' working tree by:
   * IDC  — the C++ MultiSeedIDC analytical optimizer (a budget-respecting
@@ -21,7 +21,7 @@ counts 63/59/70/85/90/91 of 92 across n_c = 5..160, cell-win rate
   * NSGA-II / NSGA-III / MOEA-D — pymoo, same per-problem budget;
 followed by `cocopp` post-processing and `parse_cocopp_idc_wins.py`. Those
 authoritative win tallies are committed at
-`results/bbob-biobj-mixint/{summary,per_function}_idc_wins.csv`, so the §8.2
+`results/bbob-biobj-mixint/{summary,per_function}_idc_wins.csv`, so the §7.2
 TABLE is reproducible from committed data without re-running the sweep.
 
 This module provides a *self-contained, budget-fair* reproduction path so a
@@ -185,7 +185,7 @@ def run_problem(problem, algo, seed, multiobjective=True, budget=DEFAULT_BUDGET)
     if not multiobjective:
         raise NotImplementedError(
             "coco_runner currently implements the MO bbob-biobj-mixint path "
-            "(the §8.2 suite). For the SO suites use the authors' workspace "
+            "(the §7.2 suite). For the SO suites use the authors' workspace "
             "runner; see README.md.")
     if algo == "idc":
         hv = _idc_mo(problem, seed, budget)

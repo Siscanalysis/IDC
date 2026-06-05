@@ -26,12 +26,12 @@
 # -----------------------------------------------------------------------------
 #
 # The examples build against the refactored OpenNN API (JSON model format and
-# the ResponseOptimization class used throughout §8), which currently lives on
+# the ResponseOptimization class used throughout §7), which currently lives on
 # the `dev-refactor` branch of Artelnics/opennn. That work is published as the
 # immutable annotated tag `v1.2-IDC-paper` (commit 64889b5e4) -- the paper
 # version of record -- so a clean clone is byte-reproducible and does not drift
 # as `dev-refactor` advances. v1.2-IDC-paper carries the matched-budget
-# multi-objective machinery used in §8.3 (MOEED13) and §8.5 (UCI Concrete): the
+# multi-objective machinery used in §7.3 (MOEED13) and §7.5 (UCI Concrete): the
 # total surrogate-evaluation cap (set_max_total_evaluations), the reworked
 # affine-repair input swap (uniform-in-band projection; exact on equalities),
 # and the configurable initial-sampling factor (set_initial_sampling_factor).
@@ -41,7 +41,7 @@
 #
 set(OPENNN_DEFAULT_TAG "v1.2-IDC-paper" CACHE STRING
     "Default OpenNN ref for reproduction. Pinned to the immutable tag \
-     v1.2-IDC-paper (commit 64889b5e4) on Artelnics/opennn -- the §8 \
+     v1.2-IDC-paper (commit 64889b5e4) on Artelnics/opennn -- the §7 \
      ResponseOptimization API plus the matched-budget evaluation cap, \
      the paper version of record.")
 

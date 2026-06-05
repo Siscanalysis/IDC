@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """
-audit_surrogates.py — surrogate-quality audit (paper §8.5).
+audit_surrogates.py — surrogate-quality audit (paper §7.5).
 
 Renders the per-entry surrogate test-R^2 table behind the 'surrogate-side'
-check in §8.5: a real-data headline must rest on a surrogate that actually
+check in §7.5: a real-data headline must rest on a surrogate that actually
 fits, so an IDC 'win' on a poorly-fit surrogate is treated as an artifact of
 surrogate quality, not optimizer skill. Reads the committed
 `extra_results/surrogate_audit.csv` (the R^2 values reported in the paper) and

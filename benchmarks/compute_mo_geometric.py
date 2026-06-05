@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-compute_mo_geometric.py — recompute the §8 multi-objective geometric
+compute_mo_geometric.py — recompute the §7 multi-objective geometric
 front-quality diagnostics (Tables `mo_geom_moeed13` / `mo_geom_concrete`)
 from committed fronts, so they stay consistent with the normalized-HV tables.
 

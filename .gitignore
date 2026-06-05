@@ -40,7 +40,7 @@ Thumbs.db
 # Reproduction outputs
 benchmarks/results/
 benchmarks/**/results/
-# ...but keep the committed §8.2 BBOB win tallies (the source of Table
+# ...but keep the committed §7.2 BBOB win tallies (the source of Table
 # tab:bbob_biobj_mixint; reproducible from cocopp via parse_cocopp_idc_wins.py).
 !benchmarks/bbob/results/
 !benchmarks/bbob/results/bbob-biobj-mixint/
@@ -57,6 +57,9 @@ examples/**/output/
 *.fdb_latexmk
 *.synctex.gz
 
-# Internal working data (age-28 experiment): large regenerable CSVs + logs.
-# Not part of the public companion; reproduce via examples/ + benchmarks/.
-experiments/
+# Internal working data (age-28 experiment): exclude the bulk regenerable
+# outputs but keep the small markdown notes/scripts the paper cites
+# (e.g. experiments/concrete_age28/holdout_too_small.md).
+experiments/**/results/
+experiments/**/*.csv
+experiments/**/*.log

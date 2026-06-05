@@ -1,18 +1,18 @@
 # Reproducing the paper
 
-This document gives the recipe to build and run the §8 worked examples
+This document gives the recipe to build and run the §7 worked examples
 and validation sweeps from a clean clone of this repository. The bundled
-tooling covers the three C++ case studies (§8.3–§8.5), the BBOB / Olympus
+tooling covers the three C++ case studies (§7.3–§7.5), the BBOB / Olympus
 validation runners, the `photo_pce10` 21-seed sweep + aggregation, the
 surrogate-quality audit, the MO figure-regeneration, and the pymoo/pycma
-baselines for the three §8 example problems
+baselines for the three §7 example problems
 ([`benchmarks/baselines/`](../benchmarks/baselines/)). Only the broader
-~30-problem benchmark catalog the paper's §8.1 points to and its baseline
+~30-problem benchmark catalog the paper's §7.1 points to and its baseline
 sweep are part of the authors' workspace and are not shipped here.
 
 For the conceptual overview of IDC, see [architecture.md](architecture.md).
-For the memorization/hallucination safeguards used in the §8.4 (top-5%
-holdout) and §8.5 (age-28 restriction) real-application case studies, see
+For the memorization/hallucination safeguards used in the §7.4 (top-5%
+holdout) and §7.5 (age-28 restriction) real-application case studies, see
 [holdout_procedure.md](holdout_procedure.md).
 
 ---
@@ -84,14 +84,14 @@ by the one-time OpenNN compilation; subsequent rebuilds are incremental.
 
 ---
 
-## IDC configuration and evaluation budget (paper §8.1)
+## IDC configuration and evaluation budget (paper §7.1)
 
-These are the hyperparameters the §8 results are reported at. The
+These are the hyperparameters the §7 results are reported at. The
 runner defaults reproduce them; the switches documented in
 [`../benchmarks/README.md`](../benchmarks/README.md) let you change them
 to explore configurations **not** shown in the paper.
 
-**IDC default configuration** (the SO §8 results unless noted):
+**IDC default configuration** (the SO §7 results unless noted):
 
 | Parameter | Symbol | Value |
 |-----------|--------|-------|
@@ -118,17 +118,17 @@ top-level `problem.yaml` → `result.csv`) and a tolerance band
 (`band/problem.yaml` → `band/result.csv`); run `./bin/<example>` then
 `./bin/<example> band`. Why the MO budget differs from the nominal 40,000: IDC's
 MO loop samples per Pareto point per iteration, so a matched budget requires the
-explicit total-evaluation cap (see §8.3).
+explicit total-evaluation cap (see §7.3).
 
 **Baselines** (all run against the *same* trained surrogate as IDC, at
 the matched budget): single-objective — CMA-ES via `pycma`, plus DE, GA,
 PSO via `pymoo` (40,000); multi-objective — NSGA-II, NSGA-III, MOEA/D via
 `pymoo` (400,000; `--subdir band` for the band formulation).
 
-**Held-out protocol** (the SO real-application case, §8.4 photo_pce10):
+**Held-out protocol** (the SO real-application case, §7.4 photo_pce10):
 top-5% by objective held out, `S = 5` surrogate-training seeds, 80%
 subsample of the remaining rows, 5 × 21 = 105 runs per algorithm. The
-§8.5 Concrete case is **not** held out — it uses the age-28 restriction
+§7.5 Concrete case is **not** held out — it uses the age-28 restriction
 plus the measured data ceiling instead (see below). See
 [holdout_procedure.md](holdout_procedure.md).
 
@@ -137,7 +137,7 @@ plus the measured data ceiling instead (see below). See
 ## Step 3 — Run a single example
 
 The two real-application C++ case studies are built into `bin/`. To
-reproduce just §8.4 (photo_pce10, single-objective):
+reproduce just §7.4 (photo_pce10, single-objective):
 
 ```bash
 ./bin/photo_pce10
@@ -145,9 +145,9 @@ reproduce just §8.4 (photo_pce10, single-objective):
 
 The executable writes `examples/photo_pce10/result.csv` containing
 the IDC-recommended input configuration and the corresponding surrogate
-output. Compare to the headline number in the §8.4 table of the paper.
+output. Compare to the headline number in the §7.4 table of the paper.
 
-The four headline §8 examples map to the following entry points:
+The four headline §7 examples map to the following entry points:
 
 | § | Example | Entry point | Block |
 |---|---------|-------------|-------|
@@ -156,7 +156,7 @@ The four headline §8 examples map to the following entry points:
 | 8.4 | photo_pce10 | `./bin/photo_pce10` | Real application (SO) |
 | 8.5 | concrete_uci_mo | `./bin/concrete_uci_mo` | Real application (MO) |
 
-The §8.2 BBOB validation is Python-only (analytical functions, no
+The §7.2 BBOB validation is Python-only (analytical functions, no
 surrogate); the other three are OpenNN C++ executables.
 
 ---
@@ -167,16 +167,16 @@ The analytical and Olympus validation are driven from `benchmarks/`:
 
 ```bash
 cd benchmarks
-python bbob/run_bbob_suites.py    # §8.2 analytical validation (default suite)
-python bbob/run_bbob_stress.py    # §7.3 f15–f24 hard-multimodal stress test
-python run_olympus.py             # §8.4 photo_pce10 (Olympus real-data SO)
-python run_idc_21seeds.py         # §8.4 photo_pce10 IDC sweep, 21 seeds
+python bbob/run_bbob_suites.py    # §7.2 analytical validation (default suite)
+python bbob/run_bbob_stress.py    # §6.3 f15–f24 hard-multimodal stress test
+python run_olympus.py             # §7.4 photo_pce10 (Olympus real-data SO)
+python run_idc_21seeds.py         # §7.4 photo_pce10 IDC sweep, 21 seeds
 python aggregate_21seeds.py       # per-problem summary (mean ± std, best, feas%)
-python audit_surrogates.py        # §8.5 surrogate-quality R² audit table
-python make_figures.py            # §8 MO figures from committed CSVs
-python make_convergence_figure.py # §8.4 best-feasible-vs-evaluations figure
+python audit_surrogates.py        # §7.5 surrogate-quality R² audit table
+python make_figures.py            # §7 MO figures from committed CSVs
+python make_convergence_figure.py # §7.4 best-feasible-vs-evaluations figure
 
-# pymoo/pycma baselines for the three §8 example problems (same surrogate +
+# pymoo/pycma baselines for the three §7 example problems (same surrogate +
 # YAML as the C++ IDC binaries; emits feasibility + mean constraint violation):
 python baselines/run_baselines.py --example photo_pce10     --seeds 21
 python baselines/run_baselines.py --example concrete_uci_mo --seed  42
@@ -193,10 +193,10 @@ Each runner writes under `benchmarks/results/`; the 21-seed summary lands
 in `benchmarks/results/branch_a/photo_pce10_summary_21seeds.csv`, the
 baseline tables in `benchmarks/baselines/results/<example>_baselines.csv`,
 and the figures in `benchmarks/figures/`. The pymoo/pycma baselines for the
-three §8 example problems ship in `benchmarks/baselines/`
-(see its README); only the broader ~30-problem benchmark catalog (the §8.1
+three §7 example problems ship in `benchmarks/baselines/`
+(see its README); only the broader ~30-problem benchmark catalog (the §7.1
 catalog) and its baseline sweep run from the authors' development workspace
-and are **not** bundled here. The §8 headline numbers are reproduced by the
+and are **not** bundled here. The §7 headline numbers are reproduced by the
 C++ worked examples (Step 3), the 21-seed sweep, the bundled baselines, and
 the validation runners above.
 
@@ -226,11 +226,11 @@ For convenience, every step above is wrapped in:
 ```
 
 This runs: (1) configure + build (fetching the pinned OpenNN), (2) the
-three C++ case studies (MOEED13 §8.3, photo_pce10 §8.4, concrete_uci_mo
-§8.5), (3) the BBOB analytical validation (§8.2) and the f15–f24 stress
-test (§7.3), (4) the §8.4 Olympus real-data SO sweep, (5) the
+three C++ case studies (MOEED13 §7.3, photo_pce10 §7.4, concrete_uci_mo
+§7.5), (3) the BBOB analytical validation (§7.2) and the f15–f24 stress
+test (§6.3), (4) the §7.4 Olympus real-data SO sweep, (5) the
 photo_pce10 21-seed sweep + aggregation, (6) the surrogate-quality
-audit, and (7) the §8 MO figure regeneration. Re-running is safe: the
+audit, and (7) the §7 MO figure regeneration. Re-running is safe: the
 build is incremental and each example overwrites its own `result.csv`.
 The broader multi-seed catalog sweep and the held-out cross-table (the
 full SO catalog and the pymoo/pycma baselines) are run from the authors'

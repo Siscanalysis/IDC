@@ -1,6 +1,6 @@
 # IDC default hyperparameters — how they were chosen
 
-All §8 results use a **single default IDC configuration**
+All §7 results use a **single default IDC configuration**
 
 | Hyperparameter | Symbol | Value |
 |---|---|---|
@@ -31,14 +31,16 @@ promoted. At the 40 000-evaluation budget used for the IDC-vs-baseline
 comparisons, that winner is `e2000_i20_z85` — the default above.
 
 The driver, orchestrator, the auto-generated per-problem config JSONs, and the
-per-problem / mean-rank result tables live in the benchmark repository under
-`grid_search/` (`cpp/grid_idc.cpp`, `python/run_grid.py`, `configs/`,
-`results/phase_{1,2}/`), so the full sweep is reproducible end to end.
+per-problem / mean-rank result tables are maintained in the authors' separate
+benchmark workspace (not bundled in this companion); the grid is reproduced by
+re-running the two-phase procedure described above (driver `grid_idc.cpp`,
+orchestrator `run_grid.py`), so the search is reproducible from the procedure
+rather than from committed sweep outputs.
 
 ## Tuning problems (23)
 
 The search ranks each configuration across a broad Level-1 suite. **Note:** this
-suite overlaps the §8 case studies (`concrete_uci`, `photo_pce10` appear in
+suite overlaps the §7 case studies (`concrete_uci`, `photo_pce10` appear in
 both); because the default is selected for cross-problem stability rather than
 per-problem performance, it is not tuned to any single case study, but the
 overlap is stated here for transparency.

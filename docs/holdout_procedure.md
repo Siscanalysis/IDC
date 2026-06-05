@@ -4,18 +4,18 @@ This document specifies the safeguards that separate **optimizer
 behavior** from **surrogate memorization / hallucination risk** in the
 real-application case studies. They differ by case:
 
-- The **single-objective** §8.4 (photo_pce10) case uses the top-K%
+- The **single-objective** §7.4 (photo_pce10) case uses the top-K%
   held-out cross-validation defined below — its 1040-row dataset is large
   enough to absorb a 5% removal.
-- The **multi-objective** §8.5 (concrete_uci_mo) case **cannot** use it:
+- The **multi-objective** §7.5 (concrete_uci_mo) case **cannot** use it:
   its age-28 slice (425 rows) is too small for a further 5% removal
   without losing surrogate fidelity. It instead uses an **age-28
   surrogate restriction** plus a measured-data-ceiling check (see the
   "Multi-objective case" section at the end).
 
-The simulator and analytical validation cases (§8.2 BBOB, §8.3 MOEED13)
+The simulator and analytical validation cases (§7.2 BBOB, §7.3 MOEED13)
 are not held out, because their objective surfaces are exact and there is
-no measurement data to withhold. The protocol below is defined in §8.1
+no measurement data to withhold. The protocol below is defined in §7.1
 of the paper.
 
 ---
@@ -36,7 +36,7 @@ not memorization.
 
 ## Protocol — top-5% holdout
 
-For the held-out single-objective case study (§8.4 photo_pce10, and, in
+For the held-out single-objective case study (§7.4 photo_pce10, and, in
 the companion repo, each catalog entry in
 `benchmarks/results/branch_a/`):
 
@@ -62,7 +62,7 @@ the companion repo, each catalog entry in
 ## Metrics
 
 For each (problem, optimizer, surrogate seed) combination, **two** metrics
-are reported — the `value_gap` / `space_gap` pair defined in §8.1 of the
+are reported — the `value_gap` / `space_gap` pair defined in §7.1 of the
 paper. Let $y^*_{\rm data}$ be the dataset-wide best objective (always in
 the held-out set $H$, since the top-$X\%$ contains the argmax),
 $\xvec_{\rm argmax}$ its input vector; $y^*_{\rm train}$ and
@@ -117,8 +117,8 @@ The two metrics together give a $2 \times 2$ read:
 Each metric is aggregated across the $5 \times 21 = 105$
 (optimizer seed, surrogate seed) pairs per (problem, optimizer) cell as a
 median with the $p25$–$p75$ interquartile range; these populate the
-held-out table of the §8.4 single-objective case study. The
-multi-objective §8.5 case does not use this holdout (see below); it is
+held-out table of the §7.4 single-objective case study. The
+multi-objective §7.5 case does not use this holdout (see below); it is
 reported with the empirical-reference hypervolume on the age-28
 surrogate, since a single-argmax attribution is ambiguous on a Pareto
 set.
@@ -138,12 +138,12 @@ exploiting surrogate overfit (the hallucination regime); one that scores
 well on both is doing the right thing for the right reasons.
 
 This is the headline reason IDC's reliability on the real-data case
-studies (photo_pce10 §8.4, concrete_uci_mo §8.5) is interpreted as a
+studies (photo_pce10 §7.4, concrete_uci_mo §7.5) is interpreted as a
 strength rather than just luck: IDC's recommended points are close in
 input space to the actual held-out best, not just in surrogate-output
 space.
 
-> **Reproducing the §8.4 diagnostics.** The two-metric `value_gap` /
+> **Reproducing the §7.4 diagnostics.** The two-metric `value_gap` /
 > `space_gap` pair above is reproduced from a clean clone by the held-out
 > pipeline in [`../benchmarks/holdout/`](../benchmarks/holdout/):
 > `gen_holdout_splits.py` (top-5% splits) → `train_surrogate` (OpenNN
@@ -156,11 +156,11 @@ space.
 
 ---
 
-## Multi-objective case (§8.5 concrete_uci_mo): age-28 restriction
+## Multi-objective case (§7.5 concrete_uci_mo): age-28 restriction
 
 The age-28 slice of the Yeh dataset is only 425 rows — too small to
 remove a further 5% without dropping below the size at which the Growing
-Neurons selector returns a faithful proxy. So §8.5 uses a different
+Neurons selector returns a faithful proxy. So §7.5 uses a different
 safeguard against the same memorization/hallucination risk:
 
 1. **Lock the curing age** at 28 days (the standard strength-comparison
@@ -174,7 +174,7 @@ safeguard against the same memorization/hallucination risk:
    strength exceeds this ceiling is, by definition, surrogate
    extrapolation past the measurements; the count of points above the
    ceiling is the hallucination check (it is zero for all algorithms in
-   §8.5).
+   §7.5).
 
 The "too small for a 5% removal" concern is not merely asserted: we
 attempted the top-5% holdout on the 425-row slice anyway, and the
@@ -187,7 +187,7 @@ for the numbers and a one-command reproduction. Note also that the
 holdout's value/space-gap attribution is built around a single argmax and
 is in general harder to apply to a multi-objective Pareto set.
 
-The §8.5 comparison is then run with 21 optimizer seeds against this
+The §7.5 comparison is then run with 21 optimizer seeds against this
 single age-28 surrogate and ranked by empirical-reference hypervolume,
 rather than by the value/space-gap pair above.
 
@@ -202,6 +202,6 @@ rather than by the value/space-gap pair above.
   IDC with active learning.
 
 - It does not measure feasibility separately; constraint satisfaction is
-  reported in a separate feasibility column of the §8.4 held-out table
-  and of the §8.5 Concrete results table (the latter under the strict
+  reported in a separate feasibility column of the §7.4 held-out table
+  and of the §7.5 Concrete results table (the latter under the strict
   yaml-constraint filter, not a held-out split).

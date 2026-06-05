@@ -26,21 +26,21 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 include(FindOrFetchOpenNN)
 
 # -----------------------------------------------------------------------------
-# Worked examples (§8 of the paper)
+# Worked examples (§7 of the paper)
 # -----------------------------------------------------------------------------
 # Each subdirectory adds one example_<name> executable that links against OpenNN.
 # The CMake target name matches the §-anchor in the paper.
 
-option(IDC_BUILD_EXAMPLES "Build the §8 worked examples" ON)
+option(IDC_BUILD_EXAMPLES "Build the §7 worked examples" ON)
 
 if(IDC_BUILD_EXAMPLES)
-    # In-paper C++ neural-network case studies (§8.3–§8.5). Each subdirectory
+    # In-paper C++ neural-network case studies (§7.3–§7.5). Each subdirectory
     # adds one executable (target name matches the §-anchor) linking OpenNN.
-    # The §8.2 BBOB analytical validation is Python-only (benchmarks/bbob/).
-    add_subdirectory(examples/moeed13)           # §8.3 Validation (simulator MO)
-    add_subdirectory(examples/photo_pce10)       # §8.4 Real application (SO)
-    add_subdirectory(examples/concrete_uci_mo)   # §8.5 Real application (MO)
-    add_subdirectory(benchmarks/holdout)         # §8.4 held-out surrogate trainer
+    # The §7.2 BBOB analytical validation is Python-only (benchmarks/bbob/).
+    add_subdirectory(examples/moeed13)           # §7.3 Validation (simulator MO)
+    add_subdirectory(examples/photo_pce10)       # §7.4 Real application (SO)
+    add_subdirectory(examples/concrete_uci_mo)   # §7.5 Real application (MO)
+    add_subdirectory(benchmarks/holdout)         # §7.4 held-out surrogate trainer
 
     # Additional catalog examples (not shown in the manuscript). Their C++
     # drivers follow the same template; enable once their main.cpp land.

@@ -1,11 +1,11 @@
-// Worked example — IDC on MOEED13 economic-emission dispatch (paper Section 8.3).
+// Worked example — IDC on MOEED13 economic-emission dispatch (paper Section 7.3).
 //
 // Loads the trained 2-output OpenNN surrogate (13 generator setpoints -> total
 // cost, total NOx emission), declares the per-unit bounds and the
 // power-balance constraint from problem.yaml, and runs multi-objective IDC to
 // recover the cost/emission Pareto front. Writes result.csv.
 //
-// Two constraint formulations are shipped (paper Section 8.3):
+// Two constraint formulations are shipped (paper Section 7.3):
 //   * default (no argument): the EQUALITY formulation sum(P_i) == 1800 MW,
 //     read from EXAMPLE_DIR/problem.yaml, written to EXAMPLE_DIR/result.csv.
 //   * argv[1] == "band": the tolerance-BAND formulation 1800 +/- 0.5 MW, read
@@ -88,7 +88,7 @@ int main(int argc, char** argv)
         // Power-balance equality (|sum P_i - D| <= 0.5 MW) from the YAML.
         opennn_idc::apply_yaml_constraints(opt, yaml_path);
 
-        // Matched-budget study (Section 8.3). IDC and the pymoo baselines are
+        // Matched-budget study (Section 7.3). IDC and the pymoo baselines are
         // both held to the same TOTAL surrogate-evaluation budget. Per-point
         // sampling is reduced 2000 -> 200 so IDC can refine over ~10 iterations
         // within the budget instead of a few coarse ones, and the total is

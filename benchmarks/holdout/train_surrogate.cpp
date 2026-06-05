@@ -4,7 +4,7 @@
 // benchmarks/gen_holdout_splits.py, and exports it as JSON (.json, loaded by
 // the C++ IDC driver) AND as the numpy NeuralNetwork .py (loaded by the
 // pymoo/pycma baselines in benchmarks/baselines/). This is the OpenNN
-// Growing-Neurons training step behind the §8.4 held-out diagnostics
+// Growing-Neurons training step behind the §7.4 held-out diagnostics
 // (Table value_gap/space_gap), made reproducible from a clean clone.
 //
 // Mirrors the training path of the authors' baseline_trainer (Growing Neurons

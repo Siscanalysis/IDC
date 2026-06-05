@@ -1,6 +1,6 @@
-# Constraints — COCO `bbob-biobj-mixint` (§8.2)
+# Constraints — COCO `bbob-biobj-mixint` (§7.2)
 
-The §8.2 analytical validation has no dataset and no user-defined formula
+The §7.2 analytical validation has no dataset and no user-defined formula
 constraints; its feasible set is defined entirely by the COCO suite. Two
 structural constraints apply to every problem in the suite.
 
@@ -13,7 +13,7 @@ x_i ∈ [-5, 5],   i = 1 … n
 ```
 
 where `n ∈ {5, 10, 20, 40, 80, 160}` is the dimension cohort
-(§8.2 setup). IDC's initial domain is exactly this box.
+(§7.2 setup). IDC's initial domain is exactly this box.
 
 ## 2. Integrality of the integer block
 
@@ -30,7 +30,7 @@ restricted to a per-coordinate finite range fixed by the COCO instance.
 IDC handles the integer block by categorical/integer block elimination
 (§3 of the paper); pymoo handles it through its mixed-variable operators.
 
-## Worked cell (paper §8.2)
+## Worked cell (paper §7.2)
 
 The representative cell formalized in the paper is the bi-objective pair
 built from BBOB SO function f18 (Schaffer's F7, ill-conditioned, condition
@@ -52,5 +52,5 @@ differ in their structural constraints:
 | `bbob-biobj` | yes | none | none |
 | `bbob-biobj-mixint` | yes | integer block | none |
 
-These are reported only in the companion repository; §8.2 shows
+These are reported only in the companion repository; §7.2 shows
 `bbob-biobj-mixint`.

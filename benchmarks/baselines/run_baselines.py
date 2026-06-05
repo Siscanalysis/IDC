@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """
-run_baselines.py — pymoo / pycma baselines for the §8 case studies, evaluated
+run_baselines.py — pymoo / pycma baselines for the §7 case studies, evaluated
 on the SAME trained surrogate the C++ IDC binaries use, so the per-algorithm
-feasibility and constraint-violation comparison reported in the §8.4 / §8.5
+feasibility and constraint-violation comparison reported in the §7.4 / §7.5
 tables is reproducible from a clean clone.
 
 What it records, per (algorithm, seed):
@@ -280,9 +280,9 @@ def main() -> int:
     ap.add_argument("--seeds", type=int, default=None,
                     help="run seeds 42..42+N-1 (overrides --seed)")
     ap.add_argument("--budget", type=int, default=40000,
-                    help="total function-evaluation budget per seed. The §8.3/§8.5 "
+                    help="total function-evaluation budget per seed. The §7.3/§7.5 "
                          "matched-budget MO study uses 400000 (to match IDC's "
-                         "set_max_total_evaluations cap); the §8.4 SO study uses 40000.")
+                         "set_max_total_evaluations cap); the §7.4 SO study uses 40000.")
     ap.add_argument("--subdir", default="",
                     help="formulation subdirectory under examples/<example>/ "
                          "(e.g. 'band' for the tolerance-band MO formulation; "

@@ -1,4 +1,4 @@
-# §8.5 — Real-application case study (MO): UCI Concrete (max strength, min cement)
+# §7.5 — Real-application case study (MO): UCI Concrete (max strength, min cement)
 
 **Buildable C++ example.** `main.cpp` loads the trained strength
 surrogate (`nn/concrete_uci.json`), applies the affine constraints in
@@ -6,7 +6,7 @@ surrogate (`nn/concrete_uci.json`), applies the affine constraints in
 writes the Pareto front to `result.csv`. Built via the top-level CMake
 (target `concrete_uci_mo`).
 
-**Two mass-balance formulations** are shipped (see §8.5):
+**Two mass-balance formulations** are shipped (see §7.5):
 
 | run | mass balance | files |
 |-----|--------------|-------|
@@ -27,9 +27,9 @@ on the equality. All runs use the **same 400,000 total surrogate-evaluation
 budget** with a `10×` initial-sampling pass.
 
 This is one of the two **real-application** case studies in the paper
-(the other is photo_pce10, §8.4). Unlike the SO case, it is **not**
+(the other is photo_pce10, §7.4). Unlike the SO case, it is **not**
 reported under the top-5% held-out protocol: the age-28 slice (425 rows)
-is too small for a further 5% removal, so §8.5 instead uses an
+is too small for a further 5% removal, so §7.5 instead uses an
 **age-28 surrogate restriction** (the surrogate is trained only on the
 age-28 mixes) and calibrates against the measured data ceiling
 (see [`../../docs/holdout_procedure.md`](../../docs/holdout_procedure.md)).
@@ -102,14 +102,14 @@ UCI Machine Learning Repository: *Concrete Compressive Strength*
 The MO reformulation is purely in the optimization conditions: the
 cement input variable additionally carries a `min` objective condition.
 The shipped surrogate `nn/concrete_uci.json` is the
-**age-28-restricted** strength model used in §8.5 — trained on the 425
+**age-28-restricted** strength model used in §7.5 — trained on the 425
 age-28 mixes only (test R² ≈ 0.79, training R² ≈ 0.76, RMSE ≈ 7.2 MPa),
 so it shares the curing age of the optimization target and cannot
 extrapolate strength patterns from older mixes. (For reference, an
 all-ages surrogate over the full 1030 rows fits higher, R² ≈ 0.97, but
-at the cost of cross-age extrapolation; §8.5 deliberately uses the
+at the cost of cross-age extrapolation; §7.5 deliberately uses the
 age-28 model instead. That all-ages model is not shipped here.)
-Budget: the §8.5 matched-budget MO study holds IDC and the NSGA-II/III
+Budget: the §7.5 matched-budget MO study holds IDC and the NSGA-II/III
 baselines to the **same 400,000 total surrogate-evaluation budget** (IDC via
 `set_max_total_evaluations(400000)` with per-point sampling $N=200$; on this
 problem IDC converges before the cap, at $\approx 377{,}000$ evaluations). The
@@ -133,8 +133,8 @@ python ../benchmarks/baselines/run_baselines.py --example concrete_uci_mo --seed
 python ../benchmarks/mo_matched_budget.py
 ```
 
-The Pareto front plot is reported in the §8.5 Pareto-front figure of the
-paper; the internal-gap and boundary-gap stability metrics in the §8.5
+The Pareto front plot is reported in the §7.5 Pareto-front figure of the
+paper; the internal-gap and boundary-gap stability metrics in the §7.5
 results table; the normalized-HV / residual numbers in `tab:case_concrete_mo`.
 
 **Reproducibility scope.** The matched-budget config ($N=200$,

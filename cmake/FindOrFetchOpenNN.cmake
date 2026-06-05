@@ -94,6 +94,15 @@ endif()
 if(NOT DEFINED OpenNN_BUILD_VISION)
     set(OpenNN_BUILD_VISION OFF CACHE BOOL "Build OpenNN tabular-only for IDC reproduction")
 endif()
+# OpenNN otherwise builds its own vision/NLP example executables (yolo, mnist,
+# translation, ...) which do not compile in a tabular/vision-off build; the
+# companion only needs the opennn library target, so skip them.
+if(NOT DEFINED OpenNN_BUILD_EXAMPLES)
+    set(OpenNN_BUILD_EXAMPLES OFF CACHE BOOL "Skip OpenNN's bundled examples for IDC reproduction")
+endif()
+if(NOT DEFINED OpenNN_BUILD_BLANK)
+    set(OpenNN_BUILD_BLANK OFF CACHE BOOL "Skip OpenNN's blank target for IDC reproduction")
+endif()
 
 # -----------------------------------------------------------------------------
 # Tier 1 — OPENNN_ROOT (local checkout)

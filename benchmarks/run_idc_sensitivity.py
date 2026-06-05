@@ -67,7 +67,7 @@ def run_one(exe: Path, n: int, gamma: float, seed: int, out_csv: Path) -> tuple[
 
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__)
-    ap.add_argument("--seeds", type=int, default=5, help="seeds 0..S-1 per cell")
+    ap.add_argument("--seeds", type=int, default=10, help="seeds 0..S-1 per cell (10 reproduces the committed table)")
     ap.add_argument("--out", type=Path, default=HERE / "results" / "photo_pce10_sensitivity.csv")
     args = ap.parse_args()
 

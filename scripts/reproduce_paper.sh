@@ -61,6 +61,9 @@ python benchmarks/baselines/run_baselines.py --example concrete_uci_mo --seed 42
 python benchmarks/baselines/run_baselines.py --example concrete_uci_mo --seed 42 --budget 400000 --subdir band || true
 python benchmarks/baselines/run_baselines.py --example moeed13         --seed 42 --budget 400000 || true
 python benchmarks/baselines/run_baselines.py --example moeed13         --seed 42 --budget 400000 --subdir band || true
+# §7.4 reviewer-requested extras: DIRECT + Bayesian-optimization baselines, and the N×γ sensitivity sweep.
+python benchmarks/baselines/run_extra_baselines.py --example photo_pce10 || echo "    (scipy/sklearn not installed; see benchmarks/requirements.txt)"
+python benchmarks/run_idc_sensitivity.py --seeds 10 || echo "    (build the photo_pce10 example first)"
 
 echo "==> [7/8] Surrogate-quality audit (§7.5)"
 python benchmarks/audit_surrogates.py

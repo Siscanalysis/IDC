@@ -1,0 +1,62 @@
+# Olympus photo_wf3 (Hase et al. 2021) — quaternary OPV photostability.
+# Single-objective IDC case study of the SCI 2026 paper (Sec. 3).
+#
+# The `constraints:` block below is the source of truth read at run time by
+# main.cpp (via common/yaml_constraints.h): edit it here to change the problem
+# on the IDC side. Box bounds and the objective are set in main.cpp.
+
+problem:
+  name: photo_wf3
+  type: single_objective
+  source: "Hase, F., Aldeghi, M., Hickman, R. J., Roch, L. M., & Aspuru-Guzik, A. (2021). Olympus: a benchmarking framework for noisy optimization and experiment planning. arXiv:2010.04153. Blend data: Langner et al. (2020), Adv. Mater. 32, 1907801."
+
+dataset:
+  type: real_csv
+  path: "data/photo_wf3.csv"        # 1040 rows, no header; columns: mat_1..mat_4, degradation
+  target_column: degradation
+  n_samples: 1040
+
+surrogate:
+  path: "nn/photo_wf3.json"         # OpenNN ApproximationNetwork, 4 -> 8 -> 1
+  hidden_neurons: 8
+  r2_full: 0.78
+  r2_test: 0.80
+
+# mat_1=WF3 (PBQ-QF donor), mat_2=P3HT (donor); mat_3=PCBM, mat_4=oIDTBR (acceptors).
+inputs:
+  - { name: mat_1, bounds: [0.0, 1.0] }
+  - { name: mat_2, bounds: [0.0, 1.0] }
+  - { name: mat_3, bounds: [0.0, 1.0] }
+  - { name: mat_4, bounds: [0.0, 1.0] }
+
+constraints:
+  # Simplex equality (the four mass fractions sum to 1) encoded as a tight
+  # linear band 1.0 <= sum <= 1.0; yaml_constraints.h maps lower==upper to an
+  # equality. IDC's affine-repair operator satisfies it by construction.
+  - name: simplex
+    type: linear_inequality
+    coefficients: { mat_1: 1.0, mat_2: 1.0, mat_3: 1.0, mat_4: 1.0 }
+    lower: 1.0
+    upper: 1.0
+  # Functional donor:acceptor window: total donor (WF3 + P3HT) in [0.4, 0.6],
+  # i.e. a donor:acceptor ratio between 2:3 and 3:2 (~1:1 charge-transfer
+  # balance). Pure-donor / pure-acceptor films do not form a usable
+  # bulk-heterojunction; this keeps the optimum a realistic device.
+  - name: donor_band
+    type: linear_inequality
+    coefficients: { mat_1: 1.0, mat_2: 1.0 }
+    lower: 0.4
+    upper: 0.6
+
+objective:
+  variable: degradation
+  direction: minimize
+
+budget:
+  total_nn_evaluations: 40000
+  idc_per_iteration: 2000
+  idc_max_iterations: 20
+  idc_zoom_factor: 0.85
+  idc_relative_tolerance: 1.0e-6
+
+seed: 0

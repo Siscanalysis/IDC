@@ -1,0 +1,54 @@
+# Yacht Hydrodynamics (Delft Systematic Yacht Hull Series) — bi-objective hull
+# design at fixed speed. Multi-objective IDC case study of the SCI 2026 paper
+# (Sec. 4). Source dataset: Ortigosa, Lopez & Garcia (2007) — the same problem
+# that originally motivated OpenNN.
+#
+# The objectives, box bounds and the fixed-Froude equality are declared in
+# main.cpp (no formula constraints here); this file documents the problem.
+
+problem:
+  name: yacht_mo
+  type: multi_objective
+  source: "Ortigosa, I., Lopez, R., & Garcia, J. (2007). A neural networks approach to residuary resistance of sailing yachts prediction. MARINE 2007. Delft Systematic Yacht Hull Series; UCI ML Repository, Yacht Hydrodynamics (id 243)."
+
+dataset:
+  type: real_csv
+  path: "data/yacht.csv"            # 308 rows, header; columns: 6 hull/speed inputs + resistance
+  target_column: resistance
+  n_samples: 308
+
+surrogate:
+  path: "nn/yacht.json"             # OpenNN ApproximationNetwork, 6 -> 4 -> 1
+  hidden_neurons: 4
+  r2_full: 0.995
+  r2_test: 0.99
+
+# Variable order matches yacht.csv and the surrogate input layer.
+inputs:
+  - { name: long_pos_cob,        bounds: [-5.0,   0.0] }
+  - { name: prismatic_coef,      bounds: [ 0.53,  0.60] }
+  - { name: length_displacement, bounds: [ 4.34,  5.14] }
+  - { name: beam_draught,        bounds: [ 2.81,  5.35] }
+  - { name: length_beam,         bounds: [ 2.73,  3.64] }   # objective 2 (minimized)
+  - { name: froude,              bounds: [ 0.2875, 0.2875] } # fixed at dataset mean
+
+objectives:
+  - { variable: resistance,  direction: minimize, source: nn_output }      # drag
+  - { variable: length_beam, direction: minimize, source: passthrough_input,
+      notes: "Minimizing L/B maximizes the beam (a wider, roomier, more stable hull)." }
+
+constraints: []                     # only the fixed-Froude equality (a box bound) applies
+
+budget:
+  total_nn_evaluations: 40000
+  idc_per_iteration: 2000
+  idc_max_iterations: 20
+  idc_zoom_factor: 0.85
+  idc_relative_tolerance: 1.0e-6
+
+seed: 0
+
+# Paper headline (single-seed runs vary slightly; the paper selected the best of
+# 21 seeds under a fixed normalization box): a dense front of ~270 non-dominated
+# hulls, normalized hypervolume ~ 0.59, recommended (utopia-nearest) hull at
+# L/B ~ 3.06 with residuary resistance ~ 1.4 — the knee of the trade-off.

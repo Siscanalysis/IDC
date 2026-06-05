@@ -42,12 +42,21 @@ int main(int argc, char** argv)
         fs::path nn_json    = dir / "nn" / "photo_pce10.json";
         fs::path result_csv = dir / "result.csv";
         const fs::path yaml_path = dir / "problem.yaml";
+        // IDC hyperparameters: defaults reproduce the Section 7.1 deployment
+        // configuration exactly; --evals/--zoom/--iters override them for the
+        // N x gamma sensitivity sweep (benchmarks/run_idc_sensitivity.py).
+        int   idc_evals = 2000;     // N  candidates per iteration
+        int   idc_iters = 20;       // I_max
+        float idc_zoom  = 0.85f;    // gamma zoom factor
         for(int a = 1; a < argc; ++a)
         {
             const std::string s = argv[a];
             if(s == "--seed" && a + 1 < argc)      seed = std::stoi(argv[++a]);
             else if(s == "--nn" && a + 1 < argc)   nn_json = argv[++a];
             else if(s == "--out" && a + 1 < argc)  result_csv = argv[++a];
+            else if(s == "--evals" && a + 1 < argc) idc_evals = std::stoi(argv[++a]);
+            else if(s == "--iters" && a + 1 < argc) idc_iters = std::stoi(argv[++a]);
+            else if(s == "--zoom" && a + 1 < argc)  idc_zoom = std::stof(argv[++a]);
         }
 
         // Surrogate architecture: 4 inputs -> 15 hidden -> 1 output (degradation).
@@ -81,11 +90,11 @@ int main(int argc, char** argv)
         // Simplex equality + donor band (1/6 <= mat_1+mat_2 <= 5/6) from the YAML.
         opennn_idc::apply_yaml_constraints(opt, yaml_path);
 
-        // Paper-default IDC configuration (Section 7.1).
-        opt.set_evaluations_number(2000);   // N candidates per iteration
-        opt.set_iterations(20);             // I_max
-        opt.set_zoom_factor(0.85f);         // gamma
-        opt.set_relative_tolerance(1e-6f);  // tau
+        // Paper-default IDC configuration (Section 7.1); overridable via CLI.
+        opt.set_evaluations_number(idc_evals);   // N candidates per iteration
+        opt.set_iterations(idc_iters);           // I_max
+        opt.set_zoom_factor(idc_zoom);           // gamma
+        opt.set_relative_tolerance(1e-6f);       // tau
 
         const auto t0 = std::chrono::high_resolution_clock::now();
         MatrixR results = opt.perform_response_optimization();

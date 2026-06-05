@@ -21,6 +21,8 @@ sweep.
 |------|-----------|
 | `mo_catalog_hv_igd.csv` | Multi-objective catalog: hypervolume (HV, higher better) per (problem, algorithm) at the 40k matched budget, IDC vs NSGA-II / NSGA-III / MOEA/D. (The `igd` column is a legacy extra; the paper ranks by HV and reports the geometric front-quality metrics, not IGD.) |
 | `photo_pce10_convergence.csv` | Convergence trace for the §7.4 figure: best feasible photo-degradation vs surrogate evaluations for IDC and the SO baselines, averaged over the five top-5% holdout surrogates. Rendered by [`../make_convergence_figure.py`](../make_convergence_figure.py). |
+| `photo_pce10_extra_baselines.csv` | §7.4 additional baselines (Reviewer X's named list — DIRECT, MADS, Bayesian optimization): DIRECT (`scipy.optimize.direct`, matched 40k budget) and Bayesian optimization (GP + expected improvement, native 200-eval budget, 21 seeds) on the Photo-PCE10 simplex problem, against the same surrogate as IDC. MADS is represented by DIRECT (same deterministic-poll family; no maintained solver bundled). Produced by [`../baselines/run_extra_baselines.py`](../baselines/run_extra_baselines.py). |
+| `photo_pce10_sensitivity.csv` | §7.4 N×γ hyperparameter-sensitivity sweep (Reviewer Z Major-0 / Reviewer X): best feasible photo-degradation per (N, γ, seed), 10 seeds per cell, N ∈ {500…8000} × γ ∈ {0.45…0.95}. Produced by [`../run_idc_sensitivity.py`](../run_idc_sensitivity.py). |
 
 ## Single-objective held-out diagnostics (value_gap / space_gap)
 
